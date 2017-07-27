@@ -1,8 +1,14 @@
 import * as d3 from "d3";
+import ContextMenu from './component/ContextMenu';
 
 export class Roadmappy {
 
   options = {};
+
+  items = {
+    tasks: [],
+    people: []
+  };
 
   parsedItems = {
     tasks: [],
@@ -14,6 +20,9 @@ export class Roadmappy {
   }
 
   parse({tasks, people}) {
+    this.items.tasks = tasks;
+    this.items.people = people;
+
     const colors = d3.schemeCategory20;
     for (let i = 0; i < tasks.length; i++) {
       let task = {};
@@ -67,8 +76,9 @@ export class Roadmappy {
   }
 
   render(targetElementName) {
-    this._draw(d3.select("#" + targetElementName), this.parsedItems.tasks);
-    this._draw(d3.select("#" + targetElementName), this.parsedItems.people);
+    let targetElement = d3.select("#" + targetElementName);
+    this._draw(targetElement, this.parsedItems.tasks);
+    this._draw(targetElement, this.parsedItems.people);
   }
 
   _draw(targetElement, items) {
@@ -82,6 +92,12 @@ export class Roadmappy {
     let svg = targetElement.append("svg").attr("width", w).attr("style", "overflow: visible");
     svg.attr("height", function() {
       return parseInt(svg.attr("height") || 0, 10) + h;
+    });
+
+    svg.on('contextmenu', function() {
+      d3.event.preventDefault();
+      let contextMenu = new ContextMenu(['copy json data to clip board'], 100, 100);
+      contextMenu.show(svg, d3.mouse(this)[0], d3.mouse(this)[1]);
     });
 
     let groups = [];
