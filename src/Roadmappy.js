@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import ContextMenu from './component/ContextMenu';
+import ContextMenu from "d3-v4-contextmenu";
 
 export class Roadmappy {
 
@@ -82,6 +82,8 @@ export class Roadmappy {
   }
 
   _draw(targetElement, items) {
+    let _this = this;
+
     const barHeight = 20;
     const gap = barHeight + 4;
     const topPadding = 20;
@@ -96,7 +98,20 @@ export class Roadmappy {
 
     svg.on('contextmenu', function() {
       d3.event.preventDefault();
-      let contextMenu = new ContextMenu(['copy json data to clip board'], 100, 100);
+      let contextMenu = new ContextMenu([
+        {
+          label: "copy json data to clip board",
+          cb: function (e) {
+            let dummy = document.createElement("input");
+            document.body.appendChild(dummy);
+            dummy.setAttribute("id", "copy-dummy");
+            document.getElementById("copy-dummy").value = JSON.stringify(_this.items);
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+          }
+        }
+      ]);
       contextMenu.show(svg, d3.mouse(this)[0], d3.mouse(this)[1]);
     });
 
