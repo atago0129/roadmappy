@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "build": "webpack",
-    "debug": "webpack-dev-server"
+    "debug": "webpack-dev-server --progress --colors --hot"
   },
   "author": "",
   "license": "MIT",
@@ -17,5 +17,9 @@
     "babili-webpack-plugin": "^0.1.2",
     "webpack": "^3.3.0",
     "webpack-dev-server": "^2.6.1"
+  },
+  "dependencies": {
+    "d3": "^4.10.0",
+    "d3-v4-contextmenu": "git+https://github.com/atago0129/d3-v4-contextmenu.git#master"
   }
 }
