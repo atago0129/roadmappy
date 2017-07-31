@@ -5,8 +5,11 @@
     <div id="roadmappy" data-hoge="hogehoge"></div>
     <script src="/dist/roadmappy.min.js"></script>
     <script>
-      var roadmappy = new window.Roadmappy.default();
-      roadmappy.parse(
+      var roadmappy = new window.Roadmappy.default(
+        {
+          target: "roadmappy",
+          type: "people"
+        },
         {
           "tasks":[
             {"taskGroup":"Project A","name":"Dev","from":"2014-12-1","to":"2014-12-9","color":"#F81D1D","people":2,"involvement":30},
@@ -20,7 +23,8 @@
             {"id":3,"name":"Joe","order":7}
           ]
         }
-      ).render("roadmappy");
+      );
+      roadmappy.render();
     </script>
   </body>
 </html>
