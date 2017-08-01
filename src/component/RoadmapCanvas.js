@@ -3,101 +3,69 @@ import ContextMenu from "d3-v4-contextmenu";
 
 export class RoadmapCanvas {
   type;
-
   targetElement;
+
+  style = {
+    barHeight: 20,
+    topPadding: 20
+  };
 
   constructor(options) {
     this.type = options.type;
     this.targetElement = d3.select("#" + options.target);
+    this._setStyle(options.style !== undefined ? options.style : {});
+  }
+
+  _setStyle(style) {
+    if (style.barHeight !== undefined) {
+      this.style.barHeight = parseInt(style.barHeight);
+    }
+    if (style.topPadding !== undefined) {
+      this.style.topPadding = parseInt(style.topPadding);
+    }
+    this.style.gap = this.style.barHeight + 4;
   }
 
   render(roadmap) {
-    if (this.type === "taks") {
-      this._render(roadmap.getTasks(), roadmap);
+    if (this.type === "tasks") {
+      this._render(roadmap.getTasks(), roadmap.getTaskGroups(), roadmap);
     } else if (this.type === "people") {
-      this._render(roadmap.getPeople(), roadmap);
+      this._render(roadmap.getPeople(), roadmap.getPersonGroups(), roadmap);
     } else {
-      this._render(roadmap.getTasks(), roadmap);
-      this._render(roadmap.getPeople(), roadmap);
+      this._render(roadmap.getTasks(), roadmap.getTaskGroups(), roadmap);
+      this._render(roadmap.getPeople(), roadmap.getPersonGroups(), roadmap);
     }
   }
 
-  _render(items, roadmap) {
-    const barHeight = 20;
-    const gap = barHeight + 4;
-    const topPadding = 20;
-
-    const h = items.length * gap + 40;
+  _render(items, groups, roadmap) {
     const w = this.targetElement.node().clientWidth;
+    const h = items.length * this.style.gap + 40;
 
+    let svg = this._generateSVG(w, h);
+
+    this._drawVerticalGroupBox(svg, groups, this.style.gap, this.style.topPadding, w);
+
+    let labels = this._drawVerticalLabels(svg, groups, this.style.gap, this.style.topPadding);
+
+    let sidePadding = labels.node().parentNode.getBBox().width + 15;
+
+    let xScale = this._generateXScale(items, w, sidePadding);
+    this._drwanXAxis(svg, xScale, sidePadding, this.style.topPadding);
+
+    this._drawItemLines(items, svg, xScale, this.style.gap, sidePadding, this.style.topPadding, this.style.barHeight);
+
+    this._addMouseHelper(svg, xScale, this.style.barHeight, sidePadding, roadmap);
+  }
+
+  _generateSVG(w, h) {
     let svg = this.targetElement.append("svg").attr("width", w).attr("style", "overflow: visible");
     svg.attr("height", function() {
       return parseInt(svg.attr("height") || 0, 10) + h;
     });
+    return svg;
+  }
 
-    svg.on('contextmenu', function() {
-      d3.event.preventDefault();
-      let contextMenu = new ContextMenu([
-        {
-          label: "copy json data to clip board",
-          cb: function (e) {
-            let dummy = document.createElement("input");
-            document.body.appendChild(dummy);
-            dummy.setAttribute("id", "copy-dummy");
-            document.getElementById("copy-dummy").value = roadmap.toString();
-            dummy.select();
-            document.execCommand("copy");
-            document.body.removeChild(dummy);
-          }
-        }
-      ]);
-      contextMenu.show(svg, d3.mouse(this)[0], d3.mouse(this)[1]);
-    });
-
-    let groups = [];
-    let total = 0;
-    for (let i = 0; i < items.length; i++){
-      let j = 0;
-      let found = false;
-      while (j < groups.length && !found) {
-        found = (groups[j].name === items[i].group);
-        j++;
-      }
-      if (!found) {
-        let count = 0;
-        j = 0;
-        while (j < items.length) {
-          if (items[j].group === items[i].group) {
-            count++;
-          }
-          j++;
-        }
-        groups.push({
-          type: "group",
-          name: items[i].group,
-          count: count,
-          previous: total,
-          style: items[i].style
-        });
-        total += count;
-      }
-    }
-
-    items.sort(function(a, b) {
-      if (a.group === b.group) {
-        if (a.taskOrder !== b.taskOrder) {
-          return a.taskOrder > b.taskOrder ? 1 : -1;
-        }
-        return a.from > b.from ? 1 : -1;
-      } else {
-        if (a.order !== b.order) {
-          return a.order > b.order ? 1 : -1;
-        }
-        return a.group > b.group ? 1 : -1;
-      }
-    });
-
-    // Draw vertical group boxes
+  _drawVerticalGroupBox(svg, groups, gap, topPadding, w) {
     svg.append("g")
       .selectAll("rect")
       .data(groups)
@@ -106,8 +74,13 @@ export class RoadmapCanvas {
       .attr("rx", 3)
       .attr("ry", 3)
       .attr("x", 0)
-      .attr("y", function(d){
-        return d.previous * gap + topPadding;
+      .attr("y", function(d, index){
+        // この group までの count すべて分、y 方向にずらす
+        let total = 0;
+        for (let i = 0; i < index; i++) {
+          total += groups[i].count;
+        }
+        return total * gap + topPadding;
       })
       .attr("width", function(){
         return w;
@@ -118,9 +91,10 @@ export class RoadmapCanvas {
       .attr("stroke", "none")
       .attr("fill", "#999")
       .attr("fill-opacity", 0.1);
+  }
 
-    // Draw vertical labels
-    let axisText = svg.append("g")
+  _drawVerticalLabels(svg, groups, gap, topPadding) {
+    return svg.append("g")
       .selectAll("text")
       .data(groups)
       .enter()
@@ -129,8 +103,13 @@ export class RoadmapCanvas {
         return d.name;
       })
       .attr("x", 10)
-      .attr("y", function(d){
-        return d.count * gap / 2 + d.previous * gap + topPadding + 2;
+      .attr("y", function(d, index){
+        // この group までの count すべて分、y 方向にずらす
+        let total = 0;
+        for (let i = 0; i < index; i++) {
+          total += groups[i].count;
+        }
+        return d.count * gap / 2 + total * gap + topPadding + 2;
       })
       .attr("font-size", 11)
       .attr("font-weight", function(d) {
@@ -139,11 +118,10 @@ export class RoadmapCanvas {
       .attr("text-anchor", "start")
       .attr("text-height", 14)
       .attr("fill", "#000");
+  }
 
-    let sidePadding = axisText.node().parentNode.getBBox().width + 15;
-
-    // Init time scale
-    let xScale = d3.scaleTime()
+  _generateXScale(items, w, sidePadding) {
+    return d3.scaleTime()
       .domain([
         d3.min(items, function(d) {
           return d.from;
@@ -153,7 +131,9 @@ export class RoadmapCanvas {
         })
       ])
       .rangeRound([0, w - sidePadding - 15]);
+  }
 
+  _drwanXAxis(svg, xScale, sidePadding, topPadding) {
     let xAxis = d3.axisBottom(xScale)
       .ticks(d3.timeMonday)
       .tickSize(- svg.attr("height") + topPadding + 20, 0, 0)
@@ -183,14 +163,15 @@ export class RoadmapCanvas {
         .attr("x2", xScale(now))
         .attr("y2", -svg.attr("height") + topPadding + 20)
         .attr("class", "now");
-
       xAxisGroup.selectAll(".now")
         .attr("stroke", "red")
         .attr("opacity", 0.5)
         .attr("stroke-dasharray", "2,2")
         .attr("shape-rendering", "crispEdges");
     }
+  }
 
+  _drawItemLines(items, svg, xScale, gap, sidePadding, topPadding, barHeight) {
     // Items group
     let rectangles = svg.append("g")
       .attr("transform", "translate(" + sidePadding + ", 0)")
@@ -240,8 +221,9 @@ export class RoadmapCanvas {
       .attr("text-height", barHeight)
       .attr("fill", "#000")
       .style("pointer-events", "none");
+  }
 
-    // Draw vertical mouse helper
+  _addMouseHelper(svg, xScale, barHeight, sidePadding, roadmap) {
     let verticalMouse = svg.append("line")
       .attr("x1", 0)
       .attr("y1", 0)
@@ -272,7 +254,7 @@ export class RoadmapCanvas {
       .attr("fill", "white")
       .style("display", "none");
 
-    let verticalMouseTopPadding = 40;
+    const verticalMouseTopPadding = 40;
 
     svg.on("mousemove", function () {
       let xCoord = d3.mouse(this)[0],
@@ -306,6 +288,25 @@ export class RoadmapCanvas {
       verticalMouse.style("display", "none");
       verticalMouseBox.style("display", "none");
       verticalMouseText.style("display", "none");
+    });
+
+    svg.on('contextmenu', function() {
+      d3.event.preventDefault();
+      let contextMenu = new ContextMenu([
+        {
+          label: "copy json data to clip board",
+          cb: function (e) {
+            let dummy = document.createElement("input");
+            document.body.appendChild(dummy);
+            dummy.setAttribute("id", "copy-dummy");
+            document.getElementById("copy-dummy").value = roadmap.toString();
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+          }
+        }
+      ]);
+      contextMenu.show(svg, d3.mouse(this)[0], d3.mouse(this)[1]);
     });
   }
 }

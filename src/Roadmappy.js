@@ -9,8 +9,7 @@ export class Roadmappy {
 
   constructor(options, {tasks, people}) {
     this.roadmapCanvas = new RoadmapCanvas(options);
-    let parser = new RoadmapParser();
-    this.roadmap = parser.parse(tasks, people);
+    this.roadmap = new RoadmapParser().parse(tasks, people);
   }
 
   render() {
