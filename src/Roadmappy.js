@@ -5,15 +5,22 @@ export class Roadmappy {
 
   roadmap;
 
-  roadmapCanvas;
+  canvas;
 
-  constructor(options, {tasks, people}) {
-    this.roadmapCanvas = new RoadmapCanvas(options);
-    this.roadmap = new RoadmapParser().parse(tasks, people);
+  /**
+   * @param {object} options
+   * @param {object} dataSet
+   */
+  constructor(options, dataSet) {
+    this.canvas = new RoadmapCanvas(options);
+    this.roadmap = new RoadmapParser().parse(dataSet);
   }
 
+  /**
+   * @returns {void}
+   */
   render() {
-    this.roadmapCanvas.render(this.roadmap);
+    this.canvas.render(this.roadmap);
   }
 
 
