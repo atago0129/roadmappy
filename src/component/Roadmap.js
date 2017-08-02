@@ -6,14 +6,14 @@ export class Roadmap {
   /**
    * @param {RoadmapTask} task
    */
-  setTask(task) {
+  addTask(task) {
     this.tasks[task.id] = task;
   }
 
   /**
    * @param {RoadmapStory} story
    */
-  setStory(story) {
+  addStory(story) {
     this.stories[story.id] = story;
   }
 
@@ -51,7 +51,7 @@ export class Roadmap {
   /**
    * @param {RoadmapAssignee} assignee
    */
-  setAssignee(assignee) {
+  addAssignee(assignee) {
     this.assignees[assignee.id] = assignee;
   }
 
