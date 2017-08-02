@@ -45,7 +45,7 @@ export class RoadmapParser {
         // invalid item
         continue;
       }
-      this.roadmap.setStory(new RoadmapStory(
+      this.roadmap.addStory(new RoadmapStory(
         story.id,
         story.name,
         story.order ? story.order : 0
@@ -64,7 +64,7 @@ export class RoadmapParser {
         // invalid item
         continue;
       }
-      this.roadmap.setAssignee(new RoadmapAssignee(
+      this.roadmap.addAssignee(new RoadmapAssignee(
         assignee.id,
         assignee.name,
         assignee.order ? assignee.order : 0
@@ -87,14 +87,14 @@ export class RoadmapParser {
         task.id,
         task.name,
         task.story ? task.story : null,
-        task.assignee ? (Array.isArray(task.assignee) ? task.assignee : [task.assignee]) : null,
+        task.assignee ? task.assignee : [],
         task.color ? task.color : null,
         task.order ? task.order : 0,
         task.from,
         task.to,
         task.involvement
       );
-      this.roadmap.setTask(roadmapTask);
+      this.roadmap.addTask(roadmapTask);
 
       // add task to Story group
       if (this.roadmap.getStoryById(roadmapTask.storyId) !== null) {

@@ -24,7 +24,7 @@ export class RoadmapTask {
     this.id = id;
     this.name = name;
     this.storyId = storyId;
-    this.assigneeIdList = assigneeIdList;
+    this.assigneeIdList = [].concat(assigneeIdList || []);
     this.color = color;
     this.order = parseInt(order);
     this.from = new Date(from);
