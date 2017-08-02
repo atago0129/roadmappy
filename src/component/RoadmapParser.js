@@ -1,57 +1,113 @@
 import {Roadmap} from "./Roadmap";
+import {RoadmapTask} from "./RoadmapTask";
+import {RoadmapStory} from "./RoadmapStory";
+import {RoadmapAssignee} from "./RoadmapAssignee";
 
 export class RoadmapParser {
-  parse(tasks, people) {
-    let roadmap = new Roadmap();
+  roadmap;
 
+  /**
+   * @param {object} dataSet
+   * @returns {Roadmap}
+   */
+  parse(dataSet) {
+    this.roadmap = new Roadmap();
+
+    if (dataSet.tasks === undefined) {
+      // invalid
+      return;
+    }
+
+    if (dataSet.stories === undefined && dataSet.assignees === undefined) {
+      // invalid
+      return;
+    }
+
+    if (dataSet.stories) {
+      this._parseStories(dataSet.stories);
+    }
+    if (dataSet.assignees) {
+      this._parseAssignees(dataSet.assignees);
+    }
+    this._parseTasks(dataSet.tasks);
+
+    return this.roadmap;
+  }
+
+  /**
+   * @param {object} stories
+   * @private
+   */
+  _parseStories(stories) {
+    for (let i = 0; i < stories.length; i++) {
+      let story = stories[i];
+      if (story.id === undefined || story.name === undefined) {
+        // invalid item
+        continue;
+      }
+      this.roadmap.setStory(new RoadmapStory(
+        story.id,
+        story.name,
+        story.order ? story.order : 0
+      ));
+    }
+  }
+
+  /**
+   * @param {object} assignees
+   * @private
+   */
+  _parseAssignees(assignees) {
+    for (let i = 0; i < assignees.length; i++) {
+      let assignee = assignees[i];
+      if (assignee.id === undefined || assignee.name === undefined) {
+        // invalid item
+        continue;
+      }
+      this.roadmap.setAssignee(new RoadmapAssignee(
+        assignee.id,
+        assignee.name,
+        assignee.order ? assignee.order : 0
+      ));
+    }
+  }
+
+  /**
+   * @param {object} tasks
+   * @private
+   */
+  _parseTasks(tasks) {
     for (let i = 0; i < tasks.length; i++) {
-      let task = {};
-      task.type = "task";
-      task.group = tasks[i].taskGroup ? tasks[i].taskGroup : '';
-      task.name = tasks[i].name ? tasks[i].name : '';
-      task.style = tasks[i].style ? tasks[i].style : "normal";
-      task.color = tasks[i].color ? tasks[i].color : null;
-      task.order = tasks[i].order ? parseInt(tasks[i].order, 10) : 0;
-      task.from = new Date(tasks[i].from);
-      task.to = new Date(new Date(tasks[i].to).setHours((new Date(tasks[i].to).getHours() + 24)));
-      if (tasks[i].people) {
-        if (Array.isArray(tasks[i].people)) {
-          for (let j = 0; j < tasks[i].people.length; j++) {
-            roadmap.setPerson(
-              this._parsePerson(this._getPersonById(tasks[i].people[j], people), task)
-            );
-          }
-        } else {
-          roadmap.setPerson(
-            this._parsePerson(this._getPersonById(tasks[i].people, people), task)
-          );
+      let task = tasks[i];
+      if (task.id === undefined || task.name === undefined || task.from === undefined || task.to === undefined) {
+        // invalid item
+        continue;
+      }
+      let roadmapTask = new RoadmapTask(
+        task.id,
+        task.name,
+        task.story ? task.story : null,
+        task.assignee ? (Array.isArray(task.assignee) ? task.assignee : [task.assignee]) : null,
+        task.color ? task.color : null,
+        task.order ? task.order : 0,
+        task.from,
+        task.to,
+        task.involvement
+      );
+      this.roadmap.setTask(roadmapTask);
+
+      // add task to Story group
+      if (this.roadmap.getStoryById(roadmapTask.storyId) !== null) {
+        this.roadmap.getStoryById(task.story).pushTask(roadmapTask);
+      }
+
+      // add task to Assignee group
+      for (let j = 0; j < roadmapTask.assigneeIdList.length; j++) {
+        if (this.roadmap.getAssigneeById(roadmapTask.assigneeIdList[j]) !== null) {
+          this.roadmap.getAssigneeById(roadmapTask.assigneeIdList[j]).pushTask(roadmapTask);
         }
       }
-      roadmap.setTask(task);
-    }
-    return roadmap;
-  }
-
-  _getPersonById(id, people) {
-    for (let i = 0; i < people.length; i++) {
-      if (people[i].id === id) {
-        return people[i];
-      }
     }
   }
 
-  _parsePerson(person, task) {
-    return {
-      type: "people",
-      order: person.order ? parseInt(person.order) : 0,
-      group: person.name,
-      from: task.from,
-      to: task.to,
-      name: task.group ? task.name + "(" + task.group + ")" : task.name,
-      taskGroup: task.group,
-      taskOrder: task.order,
-      color: task.color ? task.color : colors(task.group),
-      involvement: task.involvement ? parseInt(tasks.involvement, 10) : 100
-    };
-  }
 }

@@ -10,12 +10,19 @@ export class RoadmapCanvas {
     topPadding: 20
   };
 
+  /**
+   * @param {object} options
+   */
   constructor(options) {
     this.type = options.type;
     this.targetElement = d3.select("#" + options.target);
     this._setStyle(options.style !== undefined ? options.style : {});
   }
 
+  /**
+   * @param {object} style
+   * @private
+   */
   _setStyle(style) {
     if (style.barHeight !== undefined) {
       this.style.barHeight = parseInt(style.barHeight);
@@ -26,37 +33,87 @@ export class RoadmapCanvas {
     this.style.gap = this.style.barHeight + 4;
   }
 
+  /**
+   * @param {Roadmap} roadmap
+   */
   render(roadmap) {
-    if (this.type === "tasks") {
-      this._render(roadmap.getTasks(), roadmap.getTaskGroups(), roadmap);
-    } else if (this.type === "people") {
-      this._render(roadmap.getPeople(), roadmap.getPersonGroups(), roadmap);
+    if (this.type === "story") {
+      this._renderStoryTask(roadmap);
+    } else if (this.type === "assignee") {
+      this._renderAssigneeTask(roadmap);
     } else {
-      this._render(roadmap.getTasks(), roadmap.getTaskGroups(), roadmap);
-      this._render(roadmap.getPeople(), roadmap.getPersonGroups(), roadmap);
+      this._renderStoryTask(roadmap);
+      this._renderAssigneeTask(roadmap);
     }
+
   }
 
-  _render(items, groups, roadmap) {
+  /**
+   * @param {Roadmap} roadmap
+   * @private
+   */
+  _renderStoryTask(roadmap) {
+    let storyList = roadmap.getStoryList();
+    let tasks = [];
+    for (let i = 0; i < storyList.length; i++) {
+      tasks = tasks.concat(storyList[i].getTaskList());
+    }
+
     const w = this.targetElement.node().clientWidth;
-    const h = items.length * this.style.gap + 40;
+    const h = tasks.length * this.style.gap + 40;
 
     let svg = this._generateSVG(w, h);
 
-    this._drawVerticalGroupBox(svg, groups, this.style.gap, this.style.topPadding, w);
+    this._drawVerticalGroupBox(svg, storyList, this.style.gap, this.style.topPadding, w);
 
-    let labels = this._drawVerticalLabels(svg, groups, this.style.gap, this.style.topPadding);
+    let labels = this._drawVerticalLabels(svg, storyList, this.style.gap, this.style.topPadding);
 
     let sidePadding = labels.node().parentNode.getBBox().width + 15;
 
-    let xScale = this._generateXScale(items, w, sidePadding);
-    this._drwanXAxis(svg, xScale, sidePadding, this.style.topPadding);
+    let xScale = this._generateXScale(tasks, w, sidePadding);
+    this._drawXAxis(svg, xScale, sidePadding, this.style.topPadding);
 
-    this._drawItemLines(items, svg, xScale, this.style.gap, sidePadding, this.style.topPadding, this.style.barHeight);
+    this._drawItemLines(tasks, svg, xScale, this.style.gap, sidePadding, this.style.topPadding, this.style.barHeight);
 
     this._addMouseHelper(svg, xScale, this.style.barHeight, sidePadding, roadmap);
   }
 
+  /**
+   * @param {Roadmap} roadmap
+   * @private
+   */
+  _renderAssigneeTask(roadmap) {
+    let assigneeList = roadmap.getAssigneeList();
+    let tasks = [];
+    for (let i = 0; i < assigneeList.length; i++) {
+      tasks = tasks.concat(assigneeList[i].getTaskList());
+    }
+
+    const w = this.targetElement.node().clientWidth;
+    const h = tasks.length * this.style.gap + 40;
+
+    let svg = this._generateSVG(w, h);
+
+    this._drawVerticalGroupBox(svg, assigneeList, this.style.gap, this.style.topPadding, w);
+
+    let labels = this._drawVerticalLabels(svg, assigneeList, this.style.gap, this.style.topPadding);
+
+    let sidePadding = labels.node().parentNode.getBBox().width + 15;
+
+    let xScale = this._generateXScale(tasks, w, sidePadding);
+    this._drawXAxis(svg, xScale, sidePadding, this.style.topPadding);
+
+    this._drawItemLines(tasks, svg, xScale, this.style.gap, sidePadding, this.style.topPadding, this.style.barHeight);
+
+    this._addMouseHelper(svg, xScale, this.style.barHeight, sidePadding, roadmap);
+  }
+
+  /**
+   * @param {number} w
+   * @param {number} h
+   * @returns {selection}
+   * @private
+   */
   _generateSVG(w, h) {
     let svg = this.targetElement.append("svg").attr("width", w).attr("style", "overflow: visible");
     svg.attr("height", function() {
@@ -65,6 +122,14 @@ export class RoadmapCanvas {
     return svg;
   }
 
+  /**
+   * @param {selection} svg
+   * @param {AbstractRoadmapGroup[]} groups
+   * @param {number} gap
+   * @param {number} topPadding
+   * @param {number} w
+   * @private
+   */
   _drawVerticalGroupBox(svg, groups, gap, topPadding, w) {
     svg.append("g")
       .selectAll("rect")
@@ -75,10 +140,10 @@ export class RoadmapCanvas {
       .attr("ry", 3)
       .attr("x", 0)
       .attr("y", function(d, index){
-        // この group までの count すべて分、y 方向にずらす
+        // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
-          total += groups[i].count;
+          total += groups[i].getTasksLength();
         }
         return total * gap + topPadding;
       })
@@ -86,13 +151,21 @@ export class RoadmapCanvas {
         return w;
       })
       .attr("height", function(d) {
-        return d.count * gap - 4;
+        return d.getTasksLength() * gap - 4;
       })
       .attr("stroke", "none")
       .attr("fill", "#999")
       .attr("fill-opacity", 0.1);
   }
 
+  /**
+   * @param {selection} svg
+   * @param {AbstractRoadmapGroup[]} groups
+   * @param {number} gap
+   * @param {number} topPadding
+   * @returns {selection}
+   * @private
+   */
   _drawVerticalLabels(svg, groups, gap, topPadding) {
     return svg.append("g")
       .selectAll("text")
@@ -104,36 +177,46 @@ export class RoadmapCanvas {
       })
       .attr("x", 10)
       .attr("y", function(d, index){
-        // この group までの count すべて分、y 方向にずらす
+        // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
-          total += groups[i].count;
+          total += groups[i].getTasksLength();
         }
-        return d.count * gap / 2 + total * gap + topPadding + 2;
+        return d.getTasksLength() * gap / 2 + total * gap + topPadding + 2;
       })
       .attr("font-size", 11)
-      .attr("font-weight", function(d) {
-        return d.style;
-      })
       .attr("text-anchor", "start")
       .attr("text-height", 14)
       .attr("fill", "#000");
   }
 
-  _generateXScale(items, w, sidePadding) {
+  /**
+   * @param {RoadmapTask[]} tasks
+   * @param {number} w
+   * @param {number} sidePadding
+   * @private
+   */
+  _generateXScale(tasks, w, sidePadding) {
     return d3.scaleTime()
       .domain([
-        d3.min(items, function(d) {
+        d3.min(tasks, function(d) {
           return d.from;
         }),
-        d3.max(items, function(d) {
+        d3.max(tasks, function(d) {
           return d.to;
         })
       ])
       .rangeRound([0, w - sidePadding - 15]);
   }
 
-  _drwanXAxis(svg, xScale, sidePadding, topPadding) {
+  /**
+   * @param {selection} svg
+   * @param {selection} xScale
+   * @param {number} sidePadding
+   * @param {number} topPadding
+   * @private
+   */
+  _drawXAxis(svg, xScale, sidePadding, topPadding) {
     let xAxis = d3.axisBottom(xScale)
       .ticks(d3.timeMonday)
       .tickSize(- svg.attr("height") + topPadding + 20, 0, 0)
@@ -171,15 +254,23 @@ export class RoadmapCanvas {
     }
   }
 
-  _drawItemLines(items, svg, xScale, gap, sidePadding, topPadding, barHeight) {
-    // Items group
+  /**
+   * @param {RoadmapTask[]} tasks
+   * @param {selection} svg
+   * @param {selection} xScale
+   * @param {number} gap
+   * @param {number} sidePadding
+   * @param {number} topPadding
+   * @param {number} barHeight
+   * @private
+   */
+  _drawItemLines(tasks, svg, xScale, gap, sidePadding, topPadding, barHeight) {
     let rectangles = svg.append("g")
       .attr("transform", "translate(" + sidePadding + ", 0)")
       .selectAll("rect")
-      .data(items)
+      .data(tasks)
       .enter();
 
-    // Draw items boxes
     rectangles.append("rect")
       .attr("rx", 3)
       .attr("ry", 3)
@@ -214,15 +305,20 @@ export class RoadmapCanvas {
         return i * gap + 14 + topPadding;
       })
       .attr("font-size", 11)
-      .attr("font-weight", function(d) {
-        return d.style;
-      })
       .attr("text-anchor", "middle")
       .attr("text-height", barHeight)
       .attr("fill", "#000")
       .style("pointer-events", "none");
   }
 
+  /**
+   * @param {selection} svg
+   * @param {selection} xScale
+   * @param {number} barHeight
+   * @param {number} sidePadding
+   * @param {Roadmap} roadmap
+   * @private
+   */
   _addMouseHelper(svg, xScale, barHeight, sidePadding, roadmap) {
     let verticalMouse = svg.append("line")
       .attr("x1", 0)
