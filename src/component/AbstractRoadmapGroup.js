@@ -1,8 +1,8 @@
 export class AbstractRoadmapGroup {
+  type;
   id;
   name;
   order;
-  tasks = [];
 
   /**
    * @param {number|string} id
@@ -15,32 +15,4 @@ export class AbstractRoadmapGroup {
     this.order = order;
   }
 
-  /**
-   * @param {RoadmapTask} task
-   */
-  pushTask(task) {
-    this.tasks.push(task);
-  }
-
-  /**
-   * @returns {RoadmapTask[]}
-   */
-  getTaskList() {
-    let result = this.tasks;
-    result.sort(function (a, b) {
-      if (a.order !== b.order) {
-        return a.order > b.order ? 1 : -1;
-      } else {
-        return a.from > b.from ? 1 : -1;
-      }
-    });
-    return result;
-  }
-
-  /**
-   * @returns {number}
-   */
-  getTasksLength() {
-    return this.tasks.length;
-  }
 }

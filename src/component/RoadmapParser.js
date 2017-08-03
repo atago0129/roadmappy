@@ -95,18 +95,6 @@ export class RoadmapParser {
         task.involvement
       );
       this.roadmap.addTask(roadmapTask);
-
-      // add task to Story group
-      if (this.roadmap.getStoryById(roadmapTask.storyId) !== null) {
-        this.roadmap.getStoryById(task.story).pushTask(roadmapTask);
-      }
-
-      // add task to Assignee group
-      for (let j = 0; j < roadmapTask.assigneeIdList.length; j++) {
-        if (this.roadmap.getAssigneeById(roadmapTask.assigneeIdList[j]) !== null) {
-          this.roadmap.getAssigneeById(roadmapTask.assigneeIdList[j]).pushTask(roadmapTask);
-        }
-      }
     }
   }
 
