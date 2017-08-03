@@ -15,12 +15,12 @@ export class RoadmapParser {
 
     if (dataSet.tasks === undefined) {
       // invalid
-      return;
+      throw new Error("invalid data set.");
     }
 
     if (dataSet.stories === undefined && dataSet.assignees === undefined) {
       // invalid
-      return;
+      throw new Error("invalid data set.");
     }
 
     if (dataSet.stories) {
