@@ -35,24 +35,24 @@ export class RoadmapCanvas {
    */
   render(roadmap) {
     if (this.type === "story") {
-      this._render(roadmap.getStoryList(), roadmap);
+      this._render(roadmap, roadmap.getSortedStoryList());
     } else if (this.type === "assignee") {
-      this._render(roadmap.getAssigneeList(), roadmap);
+      this._render(roadmap, roadmap.getSortedAssigneeList());
     } else {
-      this._render(roadmap.getStoryList(), roadmap);
-      this._render(roadmap.getAssigneeList(), roadmap);
+      this._render(roadmap, roadmap.getSortedStoryList());
+      this._render(roadmap, roadmap.getSortedAssigneeList());
     }
   }
 
   /**
-   * @param {AbstractRoadmapGroup[]} groupList
    * @param {Roadmap} roadmap
+   * @param {AbstractRoadmapGroup[]} groupList
    * @private
    */
-  _render(groupList, roadmap) {
+  _render(roadmap, groupList) {
     let groupTasks = [];
     for (let i = 0; i < groupList.length; i++) {
-      groupTasks = groupTasks.concat(groupList[i].getTaskList());
+      groupTasks = groupTasks.concat(roadmap.getSortedTaskListByGroup(groupList[i]));
     }
 
     const w = this.targetElement.node().clientWidth;
@@ -60,9 +60,9 @@ export class RoadmapCanvas {
 
     let svg = this._appendSVG(w, h);
 
-    this._appendYAxisBoxes(svg, groupList, this.style.gap, this.style.topPadding, w);
+    this._appendYAxisBoxes(roadmap, groupList, svg, this.style.gap, this.style.topPadding, w);
 
-    let yAxisLabels = this._appendYAxisLabels(svg, groupList, this.style.gap, this.style.topPadding);
+    let yAxisLabels = this._appendYAxisLabels(roadmap, groupList, svg, this.style.gap, this.style.topPadding);
 
     let sidePadding = yAxisLabels.node().parentNode.getBBox().width + 15;
 
@@ -72,7 +72,7 @@ export class RoadmapCanvas {
 
     this._appendItemLines(groupTasks, svg, xAxisScale, this.style.gap, sidePadding, this.style.topPadding, this.style.barHeight);
 
-    this._addMouseHelper(svg, xAxisScale, this.style.barHeight, sidePadding, roadmap);
+    this._addMouseHelper(roadmap, svg, xAxisScale, this.style.barHeight, sidePadding);
   }
 
   /**
@@ -90,14 +90,15 @@ export class RoadmapCanvas {
   }
 
   /**
-   * @param {selection} svg
+   * @param {Roadmap} roadmap
    * @param {AbstractRoadmapGroup[]} groups
+   * @param {selection} svg
    * @param {number} gap
    * @param {number} topPadding
    * @param {number} w
    * @private
    */
-  _appendYAxisBoxes(svg, groups, gap, topPadding, w) {
+  _appendYAxisBoxes(roadmap, groups, svg, gap, topPadding, w) {
     return svg.append("g")
       .selectAll("rect")
       .data(groups)
@@ -110,7 +111,7 @@ export class RoadmapCanvas {
         // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
-          total += groups[i].getTasksLength();
+          total += roadmap.getSortedTaskListByGroup(groups[i]).length;
         }
         return total * gap + topPadding;
       })
@@ -118,7 +119,7 @@ export class RoadmapCanvas {
         return w;
       })
       .attr("height", function(d) {
-        return d.getTasksLength() * gap - 4;
+        return roadmap.getSortedTaskListByGroup(d).length * gap - 4;
       })
       .attr("stroke", "none")
       .attr("fill", "#999")
@@ -126,14 +127,15 @@ export class RoadmapCanvas {
   }
 
   /**
-   * @param {selection} svg
+   * @param {Roadmap} roadmap
    * @param {AbstractRoadmapGroup[]} groups
+   * @param {selection} svg
    * @param {number} gap
    * @param {number} topPadding
    * @returns {selection}
    * @private
    */
-  _appendYAxisLabels(svg, groups, gap, topPadding) {
+  _appendYAxisLabels(roadmap, groups, svg, gap, topPadding) {
     return svg.append("g")
       .selectAll("text")
       .data(groups)
@@ -147,9 +149,9 @@ export class RoadmapCanvas {
         // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
-          total += groups[i].getTasksLength();
+          total += roadmap.getSortedTaskListByGroup(groups[i]).length;
         }
-        return d.getTasksLength() * gap / 2 + total * gap + topPadding + 2;
+        return roadmap.getSortedTaskListByGroup(d).length * gap / 2 + total * gap + topPadding + 2;
       })
       .attr("font-size", 11)
       .attr("text-anchor", "start")
@@ -279,14 +281,14 @@ export class RoadmapCanvas {
   }
 
   /**
+   * @param {Roadmap} roadmap
    * @param {selection} svg
    * @param {selection} xScale
    * @param {number} barHeight
    * @param {number} sidePadding
-   * @param {Roadmap} roadmap
    * @private
    */
-  _addMouseHelper(svg, xScale, barHeight, sidePadding, roadmap) {
+  _addMouseHelper(roadmap, svg, xScale, barHeight, sidePadding) {
     const mouseBoxHeight = Math.min(20, barHeight);
     let verticalMouse = svg.append("line")
       .attr("x1", 0)
