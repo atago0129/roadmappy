@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import ContextMenu from "d3-v4-contextmenu";
+import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
 export class RoadmapCanvas {
   type;
@@ -14,7 +15,7 @@ export class RoadmapCanvas {
    * @param {object} options
    */
   constructor(options) {
-    this.type = options.type;
+    this.type = Object.values(AbstractRoadmapGroup.TYPE).indexOf(options.type) >=0 ? options.type : AbstractRoadmapGroup.TYPE.STORY;
     this.targetElement = d3.select("#" + options.target);
     this._setStyle(options.style !== undefined ? options.style : {});
   }
@@ -34,25 +35,24 @@ export class RoadmapCanvas {
    * @param {Roadmap} roadmap
    */
   render(roadmap) {
-    if (this.type === "story") {
-      this._render(roadmap, roadmap.getSortedStoryList());
-    } else if (this.type === "assignee") {
-      this._render(roadmap, roadmap.getSortedAssigneeList());
+    // TODO: check. Is this condition need?
+    if (Object.values(AbstractRoadmapGroup.TYPE).indexOf(this.type) >= 0)  {
+      this._render(roadmap, roadmap.getSortedGroup(this.type));
     } else {
-      this._render(roadmap, roadmap.getSortedStoryList());
-      this._render(roadmap, roadmap.getSortedAssigneeList());
+      this._render(roadmap, roadmap.getSortedGroup(AbstractRoadmapGroup.TYPE.STORY));
+      this._render(roadmap, roadmap.getSortedGroup(AbstractRoadmapGroup.TYPE.ASSIGNEE));
     }
   }
 
   /**
    * @param {Roadmap} roadmap
-   * @param {AbstractRoadmapGroup[]} groupList
+   * @param {AbstractRoadmapGroup[]} groups
    * @private
    */
-  _render(roadmap, groupList) {
+  _render(roadmap, groups) {
     let groupTasks = [];
-    for (let i = 0; i < groupList.length; i++) {
-      groupTasks = groupTasks.concat(roadmap.getSortedTaskListByGroup(groupList[i]));
+    for (let i = 0; i < groups.length; i++) {
+      groupTasks = groupTasks.concat(roadmap.getSortedTasksByGroup(groups[i]));
     }
 
     const w = this.targetElement.node().clientWidth;
@@ -60,9 +60,9 @@ export class RoadmapCanvas {
 
     let svg = this._appendSVG(w, h);
 
-    this._appendYAxisBoxes(roadmap, groupList, svg, this.style.gap, this.style.topPadding, w);
+    this._appendYAxisBoxes(roadmap, groups, svg, this.style.gap, this.style.topPadding, w);
 
-    let yAxisLabels = this._appendYAxisLabels(roadmap, groupList, svg, this.style.gap, this.style.topPadding);
+    let yAxisLabels = this._appendYAxisLabels(roadmap, groups, svg, this.style.gap, this.style.topPadding);
 
     let sidePadding = yAxisLabels.node().parentNode.getBBox().width + 15;
 
@@ -111,7 +111,7 @@ export class RoadmapCanvas {
         // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
-          total += roadmap.getSortedTaskListByGroup(groups[i]).length;
+          total += roadmap.getSortedTasksByGroup(groups[i]).length;
         }
         return total * gap + topPadding;
       })
@@ -119,7 +119,7 @@ export class RoadmapCanvas {
         return w;
       })
       .attr("height", function(d) {
-        return roadmap.getSortedTaskListByGroup(d).length * gap - 4;
+        return roadmap.getSortedTasksByGroup(d).length * gap - 4;
       })
       .attr("stroke", "none")
       .attr("fill", "#999")
@@ -149,9 +149,9 @@ export class RoadmapCanvas {
         // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
-          total += roadmap.getSortedTaskListByGroup(groups[i]).length;
+          total += roadmap.getSortedTasksByGroup(groups[i]).length;
         }
-        return roadmap.getSortedTaskListByGroup(d).length * gap / 2 + total * gap + topPadding + 2;
+        return roadmap.getSortedTasksByGroup(d).length * gap / 2 + total * gap + topPadding + 2;
       })
       .attr("font-size", 11)
       .attr("text-anchor", "start")
