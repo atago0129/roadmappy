@@ -1,7 +1,7 @@
 import {Roadmap} from "./Roadmap";
-import {RoadmapTask} from "./RoadmapTask";
-import {RoadmapStory} from "./RoadmapStory";
-import {RoadmapAssignee} from "./RoadmapAssignee";
+import {RoadmapTask} from "./task/RoadmapTask";
+import {RoadmapStory} from "./group/RoadmapStory";
+import {RoadmapAssignee} from "./group/RoadmapAssignee";
 
 export class RoadmapParser {
   roadmap;

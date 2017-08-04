@@ -24,11 +24,16 @@ module.exports = {
     inline: true
   },
 
+  node: {
+    fs: 'empty'
+  },
+
   module: {
     rules: [{
       test: /.js$/,
       loader: 'babel-loader',
       options: {
+        cacheDirectory: true,
         presets: [
           ['env', {
             modules: false,
@@ -46,8 +51,8 @@ module.exports = {
   },
 
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
-    new BabiliWebpackPlugin()
+    new BabiliWebpackPlugin(),
+    new webpack.HotModuleReplacementPlugin()
   ]
 
 };

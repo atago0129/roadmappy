@@ -1,4 +1,7 @@
+import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
+
 export class Roadmap {
+
   tasks = [];
   stories = [];
   assignees = [];
@@ -11,67 +14,10 @@ export class Roadmap {
   }
 
   /**
-   * @param {AbstractRoadmapGroup} group
-   * @returns {RoadmapTask[]}
-   */
-  getSortedTaskListByGroup(group) {
-    let result = [];
-    for (let i = 0; i < this.tasks.length; i++) {
-      if (group.type === "story") {
-        if (group.id === this.tasks[i].storyId) {
-          result.push(this.tasks[i]);
-        }
-      } else if (group.type === "assignee") {
-        for (let j = 0; j < this.tasks[i].assigneeIdList.length; j++) {
-          if (group.id === this.tasks[i].assigneeIdList[j]) {
-            result.push(this.tasks[i]);
-          }
-        }
-      }
-    }
-    result.sort(function (a, b) {
-      if (a.order !== b.order) {
-        return a.order > b.order ? 1 : -1;
-      } else {
-        return a.from > b.from ? 1 : -1;
-      }
-    });
-    return result;
-  }
-
-  /**
    * @param {RoadmapStory} story
    */
   addStory(story) {
     this.stories.push(story);
-  }
-
-  /**
-   * @param storyId
-   * @returns {RoadmapStory} | null
-   */
-  getStoryById(storyId) {
-    for (let i = 0; i < this.stories.length; i++) {
-      if (storyId === this.stories[i].id) {
-        return this.stories[i];
-      }
-    }
-    return null;
-  }
-
-  /**
-   * @returns {RoadmapStory[]}
-   */
-  getSortedStoryList() {
-    let result = this.stories;
-    result.sort(function (a, b) {
-      if (a.order !== b.order) {
-        return a.order > b.order ? 1 : -1;
-      } else {
-        return a.name > b.name ? 1 : -1;
-      }
-    });
-    return result;
   }
 
   /**
@@ -82,35 +28,79 @@ export class Roadmap {
   }
 
   /**
-   * @param assigneeId
-   * @returns {RoadmapAssignee} | null
+   * @param {number} taskId
+   * @return {RoadmapTask|null}
    */
-  getAssigneeById(assigneeId) {
-    for (let i = 0; i < this.assignees.length; i++) {
-      if (assigneeId === this.assignees[i].id) {
-        return this.assignees[i];
-      }
-    }
-    return null;
+  getTaskById(taskId) {
+    return this.tasks.filter(function(task) {
+      return task.id === taskId;
+    }).pop() || null;
   }
 
   /**
-   * @returns {RoadmapAssignee[]}
+   * @param {number} storyId
+   * @returns {RoadmapStory|null}
    */
-  getSortedAssigneeList() {
-    let result = this.assignees;
-    result.sort(function (a, b) {
+  getStoryById(storyId) {
+    return this.stories.filter(function(story) {
+      return story.id === storyId;
+    }).pop() || null;
+  }
+
+  /**
+   * @param {number} assigneeId
+   * @returns {RoadmapAssignee|null}
+   */
+  getAssigneeById(assigneeId) {
+    return this.assignees.filter(function(asignee) {
+      return asignee.id === assigneeId;
+    }).pop() || null;
+  }
+
+  /**
+   * @param {AbstractRoadmapGroup} group
+   * @returns {RoadmapTask[]}
+   */
+  getSortedTasksByGroup(group) {
+    return this.tasks.filter(function(task) {
+      return group.match(task);
+    }).sort(function(a, b) {
+      if (a.order !== b.order) {
+        return a.order > b.order ? 1 : -1;
+      } else {
+        return a.from > b.from ? 1 : -1;
+      }
+    });
+  }
+
+  /**
+   * @param {string} type
+   * @returns {AbstractRoadmapGroup[]}
+   */
+  getSortedGroup(type) {
+    const groups = (() => {
+      switch (type) {
+        case AbstractRoadmapGroup.TYPE.STORY:
+          return this.stories;
+        case AbstractRoadmapGroup.TYPE.ASSIGNEE:
+          return this.assignees;
+        default:
+          throw new Error('not detected group type.');
+      }
+    })();
+
+    return [].concat(groups).sort(function(a, b) {
       if (a.order !== b.order) {
         return a.order > b.order ? 1 : -1;
       } else {
         return a.name > b.name ? 1 : -1;
       }
     });
-    return result;
   }
 
   toString() {
     // TODO: implements
     return "call toString";
   }
+
 }
