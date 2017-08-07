@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const BabiliWebpackPlugin = require('babili-webpack-plugin');
 
 module.exports = {
 
@@ -51,7 +50,7 @@ module.exports = {
   },
 
   plugins: [
-    new BabiliWebpackPlugin(),
+    new webpack.optimize.UglifyJsPlugin(),
     new webpack.HotModuleReplacementPlugin()
   ]
 
