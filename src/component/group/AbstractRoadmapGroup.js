@@ -5,6 +5,14 @@ export class AbstractRoadmapGroup {
     ASSIGNEE: 'assignee'
   };
 
+  /**
+   * @param {string} type
+   * @return {boolean}
+   */
+  static isValidType(type) {
+    return Object.values(this.TYPE).indexOf(type) >= 0;
+  }
+
   type;
   id;
   name;

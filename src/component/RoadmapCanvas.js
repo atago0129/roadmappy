@@ -15,7 +15,7 @@ export class RoadmapCanvas {
    * @param {object} options
    */
   constructor(options) {
-    this.type = Object.values(AbstractRoadmapGroup.TYPE).indexOf(options.type) >=0 ? options.type : AbstractRoadmapGroup.TYPE.STORY;
+    this.type = AbstractRoadmapGroup.isValidType(type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
     this.targetElement = d3.select("#" + options.target);
     this._setStyle(options.style !== undefined ? options.style : {});
   }
@@ -35,13 +35,7 @@ export class RoadmapCanvas {
    * @param {Roadmap} roadmap
    */
   render(roadmap) {
-    // TODO: check. Is this condition need?
-    if (Object.values(AbstractRoadmapGroup.TYPE).indexOf(this.type) >= 0)  {
-      this._render(roadmap, roadmap.getSortedGroup(this.type));
-    } else {
-      this._render(roadmap, roadmap.getSortedGroup(AbstractRoadmapGroup.TYPE.STORY));
-      this._render(roadmap, roadmap.getSortedGroup(AbstractRoadmapGroup.TYPE.ASSIGNEE));
-    }
+    this._render(roadmap, roadmap.getSortedGroup(this.type));
   }
 
   /**
