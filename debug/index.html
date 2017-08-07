@@ -8,7 +8,12 @@
       var roadmappy = new window.Roadmappy.default(
         {
           target: "roadmappy",
-          type: "all"
+          type: "all",
+          style: {
+            "barHeight": 17,
+            "timeFormat": "%-m月%-d日", // required d3 time format
+            "tickInterval": "timeMonday" // required d3 interval format
+          }
         },
         {
           "tasks":[

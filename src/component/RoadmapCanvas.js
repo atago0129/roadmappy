@@ -8,14 +8,16 @@ export class RoadmapCanvas {
 
   style = {
     barHeight: 20,
-    topPadding: 20
+    topPadding: 20,
+    timeFormat: d3.timeFormat("%b %d"),
+    tickInterval: d3.timeMonday
   };
 
   /**
    * @param {object} options
    */
   constructor(options) {
-    this.type = AbstractRoadmapGroup.isValidType(type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
+    this.type = AbstractRoadmapGroup.isValidType(options.type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
     this.targetElement = d3.select("#" + options.target);
     this._setStyle(options.style !== undefined ? options.style : {});
   }
@@ -27,6 +29,12 @@ export class RoadmapCanvas {
   _setStyle(style) {
     if (style.barHeight !== undefined) {
       this.style.barHeight = parseInt(style.barHeight);
+    }
+    if (style.timeFormat !== undefined) {
+      this.style.timeFormat = d3.timeFormat(style.timeFormat);
+    }
+    if (style.tickInterval !== undefined && d3.hasOwnProperty(style.tickInterval)) {
+      this.style.tickInterval = d3[style.tickInterval];
     }
     this.style.gap = this.style.barHeight + 4;
   }
@@ -181,9 +189,9 @@ export class RoadmapCanvas {
    */
   _appendXAxis(svg, xScale, sidePadding, topPadding) {
     let xAxis = d3.axisBottom(xScale)
-      .ticks(d3.timeMonday)
+      .ticks(this.style.tickInterval)
       .tickSize(- svg.attr("height") + topPadding + 20, 0, 0)
-      .tickFormat(d3.timeFormat("%b %d"));
+      .tickFormat(this.style.timeFormat);
     let xAxisGroup = svg.append("g")
       .attr("transform", "translate(" + sidePadding + "," + (svg.attr("height") -20) + ")")
       .call(xAxis);
@@ -283,6 +291,7 @@ export class RoadmapCanvas {
    * @private
    */
   _addMouseHelper(roadmap, svg, xScale, barHeight, sidePadding) {
+    let _this = this;
     const mouseBoxHeight = Math.min(20, barHeight);
     let verticalMouse = svg.append("line")
       .attr("x1", 0)
@@ -335,7 +344,7 @@ export class RoadmapCanvas {
 
         verticalMouseText
           .attr("transform", "translate(" + xCoord + "," + (yCoord + verticalMouseTopPadding) + ")")
-          .text(d3.timeFormat("%b %d")(xScale.invert(xCoord - sidePadding)))
+          .text(d3.timeFormat(_this.style.timeFormat)(xScale.invert(xCoord - sidePadding)))
           .style("display", "block");
       } else {
         verticalMouse.style("display", "none");
