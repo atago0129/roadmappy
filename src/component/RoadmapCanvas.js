@@ -5,38 +5,15 @@ import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 export class RoadmapCanvas {
   type;
   targetElement;
-
-  style = {
-    barHeight: 20,
-    topPadding: 20,
-    timeFormat: d3.timeFormat("%b %d"),
-    tickInterval: d3.timeMonday
-  };
+  style;
 
   /**
-   * @param {object} options
+   * @param {RoadmapOption} option
    */
-  constructor(options) {
-    this.type = AbstractRoadmapGroup.isValidType(options.type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
-    this.targetElement = d3.select("#" + options.target);
-    this._setStyle(options.style !== undefined ? options.style : {});
-  }
-
-  /**
-   * @param {object} style
-   * @private
-   */
-  _setStyle(style) {
-    if (style.barHeight !== undefined) {
-      this.style.barHeight = parseInt(style.barHeight);
-    }
-    if (style.timeFormat !== undefined) {
-      this.style.timeFormat = d3.timeFormat(style.timeFormat);
-    }
-    if (style.tickInterval !== undefined && d3.hasOwnProperty(style.tickInterval)) {
-      this.style.tickInterval = d3[style.tickInterval];
-    }
-    this.style.gap = this.style.barHeight + 4;
+  constructor(option) {
+    this.type = option.type;
+    this.targetElement = d3.select(option.targetElementId);
+    this.style = option.style;
   }
 
   /**
