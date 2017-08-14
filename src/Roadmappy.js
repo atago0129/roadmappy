@@ -1,5 +1,6 @@
 import {RoadmapParser} from "./component/RoadmapParser";
 import {RoadmapCanvas} from "./component/RoadmapCanvas";
+import {RoadmapOption} from "./component/RoadmapOption";
 
 export class Roadmappy {
 
@@ -12,7 +13,7 @@ export class Roadmappy {
    * @param {object} dataSet
    */
   constructor(options, dataSet) {
-    this.canvas = new RoadmapCanvas(options);
+    this.canvas = new RoadmapCanvas(new RoadmapOption(options));
     this.roadmap = new RoadmapParser().parse(dataSet);
   }
 
