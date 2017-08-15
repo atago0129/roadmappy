@@ -1,9 +1,9 @@
-import * as d3 from "d3";
+import * as d3 from 'd3';
 
 export class RoadmapStyle {
   barHeight = 20;
   topPadding = 20;
-  timeFormat = d3.timeFormat("%b %d");
+  timeFormat = d3.timeFormat('%b %d');
   tickInterval = d3.timeMonday;
   gap;
 

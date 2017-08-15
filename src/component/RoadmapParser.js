@@ -1,7 +1,7 @@
-import {Roadmap} from "./Roadmap";
-import {RoadmapTask} from "./task/RoadmapTask";
-import {RoadmapStory} from "./group/RoadmapStory";
-import {RoadmapAssignee} from "./group/RoadmapAssignee";
+import {Roadmap} from './Roadmap';
+import {RoadmapTask} from './task/RoadmapTask';
+import {RoadmapStory} from './group/RoadmapStory';
+import {RoadmapAssignee} from './group/RoadmapAssignee';
 
 export class RoadmapParser {
   roadmap;
@@ -15,12 +15,12 @@ export class RoadmapParser {
 
     if (dataSet.tasks === undefined) {
       // invalid
-      throw new Error("invalid data set.");
+      throw new Error('invalid data set.');
     }
 
     if (dataSet.stories === undefined && dataSet.assignees === undefined) {
       // invalid
-      throw new Error("invalid data set.");
+      throw new Error('invalid data set.');
     }
 
     if (dataSet.stories) {

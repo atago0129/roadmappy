@@ -1,4 +1,4 @@
-import {AbstractRoadmapGroup} from "./AbstractRoadmapGroup";
+import {AbstractRoadmapGroup} from './AbstractRoadmapGroup';
 
 export class RoadmapStory extends AbstractRoadmapGroup {
   /**
