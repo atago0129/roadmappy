@@ -4,7 +4,7 @@ export class RoadmapTask {
   id;
   name;
   storyId;
-  assigneeIdList = [];
+  assigneeIds = [];
   color;
   order;
   from;

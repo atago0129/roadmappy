@@ -1,8 +1,9 @@
 import * as d3 from "d3";
+import {EventEmitter} from 'events';
 import ContextMenu from "d3-v4-contextmenu";
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
-export class RoadmapCanvas {
+export class RoadmapCanvas extends EventEmitter {
   type;
   targetElement;
   style;
@@ -11,6 +12,8 @@ export class RoadmapCanvas {
    * @param {RoadmapOption} option
    */
   constructor(option) {
+    super();
+
     this.type = option.type;
     this.targetElement = d3.select(option.targetElementId);
     this.style = option.style;
@@ -61,6 +64,8 @@ export class RoadmapCanvas {
    * @private
    */
   _appendSVG(w, h) {
+    this.targetElement.selectAll('*').remove();
+
     let svg = this.targetElement.append("svg").attr("width", w).attr("style", "overflow: visible");
     svg.attr("height", function() {
       return parseInt(svg.attr("height") || 0, 10) + h;
@@ -237,6 +242,9 @@ export class RoadmapCanvas {
         return d.pattern || d.color;
       })
       .attr("fill-opacity", 0.5)
+      .on('click', (task) => {
+        this.emit('click:task', task);
+      })
       .on("mouseover", function() {
         d3.select(this).style({cursor:"pointer"});
       });

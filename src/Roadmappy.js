@@ -1,8 +1,9 @@
+import {EventEmitter} from 'events';
 import {RoadmapParser} from "./component/RoadmapParser";
 import {RoadmapCanvas} from "./component/RoadmapCanvas";
 import {RoadmapOption} from "./component/RoadmapOption";
 
-export class Roadmappy {
+export class Roadmappy extends EventEmitter {
 
   roadmap;
 
@@ -13,8 +14,11 @@ export class Roadmappy {
    * @param {object} dataSet
    */
   constructor(options, dataSet) {
-    this.canvas = new RoadmapCanvas(new RoadmapOption(options));
+    super();
+
     this.roadmap = new RoadmapParser().parse(dataSet);
+    this.canvas = new RoadmapCanvas(new RoadmapOption(options));
+    this.canvas.on('click:task', this.emit.bind(this, 'click:task'));
   }
 
   /**
