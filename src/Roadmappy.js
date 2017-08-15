@@ -1,7 +1,7 @@
 import {EventEmitter} from 'events';
-import {RoadmapParser} from "./component/RoadmapParser";
-import {RoadmapCanvas} from "./component/RoadmapCanvas";
-import {RoadmapOption} from "./component/RoadmapOption";
+import {RoadmapParser} from './component/RoadmapParser';
+import {RoadmapCanvas} from './component/RoadmapCanvas';
+import {RoadmapOption} from './component/RoadmapOption';
 
 export class Roadmappy extends EventEmitter {
 

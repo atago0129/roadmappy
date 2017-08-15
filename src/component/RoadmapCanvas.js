@@ -1,6 +1,6 @@
-import * as d3 from "d3";
+import * as d3 from 'd3';
 import {EventEmitter} from 'events';
-import ContextMenu from "d3-v4-contextmenu";
+import ContextMenu from 'd3-v4-contextmenu';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
 export class RoadmapCanvas extends EventEmitter {
@@ -66,9 +66,9 @@ export class RoadmapCanvas extends EventEmitter {
   _appendSVG(w, h) {
     this.targetElement.selectAll('*').remove();
 
-    let svg = this.targetElement.append("svg").attr("width", w).attr("style", "overflow: visible");
-    svg.attr("height", function() {
-      return parseInt(svg.attr("height") || 0, 10) + h;
+    let svg = this.targetElement.append('svg').attr('width', w).attr('style', 'overflow: visible');
+    svg.attr('height', function() {
+      return parseInt(svg.attr('height') || 0, 10) + h;
     });
     return svg;
   }
@@ -83,15 +83,15 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _appendYAxisBoxes(roadmap, groups, svg, gap, topPadding, w) {
-    return svg.append("g")
-      .selectAll("rect")
+    return svg.append('g')
+      .selectAll('rect')
       .data(groups)
       .enter()
-      .append("rect")
-      .attr("rx", 3)
-      .attr("ry", 3)
-      .attr("x", 0)
-      .attr("y", function(d, index){
+      .append('rect')
+      .attr('rx', 3)
+      .attr('ry', 3)
+      .attr('x', 0)
+      .attr('y', function(d, index){
         // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
@@ -99,15 +99,15 @@ export class RoadmapCanvas extends EventEmitter {
         }
         return total * gap + topPadding;
       })
-      .attr("width", function(){
+      .attr('width', function(){
         return w;
       })
-      .attr("height", function(d) {
+      .attr('height', function(d) {
         return roadmap.getSortedTasksByGroup(d).length * gap - 4;
       })
-      .attr("stroke", "none")
-      .attr("fill", "#999")
-      .attr("fill-opacity", 0.1);
+      .attr('stroke', 'none')
+      .attr('fill', '#999')
+      .attr('fill-opacity', 0.1);
   }
 
   /**
@@ -120,16 +120,16 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _appendYAxisLabels(roadmap, groups, svg, gap, topPadding) {
-    return svg.append("g")
-      .selectAll("text")
+    return svg.append('g')
+      .selectAll('text')
       .data(groups)
       .enter()
-      .append("text")
+      .append('text')
       .text(function(d){
         return d.name;
       })
-      .attr("x", 10)
-      .attr("y", function(d, index){
+      .attr('x', 10)
+      .attr('y', function(d, index){
         // Shift y direction for all previous task length
         let total = 0;
         for (let i = 0; i < index; i++) {
@@ -137,10 +137,10 @@ export class RoadmapCanvas extends EventEmitter {
         }
         return roadmap.getSortedTasksByGroup(d).length * gap / 2 + total * gap + topPadding + 2;
       })
-      .attr("font-size", 11)
-      .attr("text-anchor", "start")
-      .attr("text-height", 14)
-      .attr("fill", "#000");
+      .attr('font-size', 11)
+      .attr('text-anchor', 'start')
+      .attr('text-height', 14)
+      .attr('fill', '#000');
   }
 
   /**
@@ -172,38 +172,38 @@ export class RoadmapCanvas extends EventEmitter {
   _appendXAxis(svg, xScale, sidePadding, topPadding) {
     let xAxis = d3.axisBottom(xScale)
       .ticks(this.style.tickInterval)
-      .tickSize(- svg.attr("height") + topPadding + 20, 0, 0)
+      .tickSize(- svg.attr('height') + topPadding + 20, 0, 0)
       .tickFormat(this.style.timeFormat);
-    let xAxisGroup = svg.append("g")
-      .attr("transform", "translate(" + sidePadding + "," + (svg.attr("height") -20) + ")")
+    let xAxisGroup = svg.append('g')
+      .attr('transform', 'translate(' + sidePadding + ',' + (svg.attr('height') -20) + ')')
       .call(xAxis);
 
-    xAxisGroup.selectAll("text")
-      .style("text-anchor", "middle")
-      .attr("fill", "#000")
-      .attr("stroke", "none")
-      .attr("font-size", 10)
-      .attr("dy", "1em");
+    xAxisGroup.selectAll('text')
+      .style('text-anchor', 'middle')
+      .attr('fill', '#000')
+      .attr('stroke', 'none')
+      .attr('font-size', 10)
+      .attr('dy', '1em');
 
-    xAxisGroup.selectAll(".tick line")
-      .attr("stroke", "#dddddd")
-      .attr("shape-rendering", "crispEdges");
+    xAxisGroup.selectAll('.tick line')
+      .attr('stroke', '#dddddd')
+      .attr('shape-rendering', 'crispEdges');
 
     // Now
     let now = new Date();
     if (now > xScale.domain()[0] && now < xScale.domain()[1]) {
       xAxisGroup
-        .append("line")
-        .attr("x1", xScale(now))
-        .attr("y1", 0)
-        .attr("x2", xScale(now))
-        .attr("y2", -svg.attr("height") + topPadding + 20)
-        .attr("class", "now");
-      xAxisGroup.selectAll(".now")
-        .attr("stroke", "red")
-        .attr("opacity", 0.5)
-        .attr("stroke-dasharray", "2,2")
-        .attr("shape-rendering", "crispEdges");
+        .append('line')
+        .attr('x1', xScale(now))
+        .attr('y1', 0)
+        .attr('x2', xScale(now))
+        .attr('y2', -svg.attr('height') + topPadding + 20)
+        .attr('class', 'now');
+      xAxisGroup.selectAll('.now')
+        .attr('stroke', 'red')
+        .attr('opacity', 0.5)
+        .attr('stroke-dasharray', '2,2')
+        .attr('shape-rendering', 'crispEdges');
     }
   }
 
@@ -218,53 +218,53 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _appendItemLines(tasks, svg, xScale, gap, sidePadding, topPadding, barHeight) {
-    let rectangles = svg.append("g")
-      .attr("transform", "translate(" + sidePadding + ", 0)")
-      .selectAll("rect")
+    let rectangles = svg.append('g')
+      .attr('transform', 'translate(' + sidePadding + ', 0)')
+      .selectAll('rect')
       .data(tasks)
       .enter();
 
-    rectangles.append("rect")
-      .attr("rx", 3)
-      .attr("ry", 3)
-      .attr("x", function(d){
+    rectangles.append('rect')
+      .attr('rx', 3)
+      .attr('ry', 3)
+      .attr('x', function(d){
         return xScale(d.from);
       })
-      .attr("y", function(d, i){
+      .attr('y', function(d, i){
         return i * gap + topPadding;
       })
-      .attr("width", function(d){
+      .attr('width', function(d){
         return xScale(d.to) - xScale(d.from);
       })
-      .attr("height", barHeight)
-      .attr("stroke", "none")
-      .attr("fill", function(d) {
+      .attr('height', barHeight)
+      .attr('stroke', 'none')
+      .attr('fill', function(d) {
         return d.pattern || d.color;
       })
-      .attr("fill-opacity", 0.5)
+      .attr('fill-opacity', 0.5)
       .on('click', (task) => {
         this.emit('click:task', task);
       })
-      .on("mouseover", function() {
-        d3.select(this).style({cursor:"pointer"});
+      .on('mouseover', function() {
+        d3.select(this).style({cursor:'pointer'});
       });
 
     // Draw items texts
-    rectangles.append("text")
+    rectangles.append('text')
       .text(function(d){
         return d.name;
       })
-      .attr("x", function(d){
+      .attr('x', function(d){
         return xScale(d.from) + (xScale(d.to) - xScale(d.from)) / 2;
       })
-      .attr("y", function(d, i){
+      .attr('y', function(d, i){
         return i * gap + (barHeight / 2 +4) + topPadding;
       })
-      .attr("font-size", 11)
-      .attr("text-anchor", "middle")
-      .attr("text-height", barHeight)
-      .attr("fill", "#000")
-      .style("pointer-events", "none");
+      .attr('font-size', 11)
+      .attr('text-anchor', 'middle')
+      .attr('text-height', barHeight)
+      .attr('fill', '#000')
+      .style('pointer-events', 'none');
   }
 
   /**
@@ -278,84 +278,84 @@ export class RoadmapCanvas extends EventEmitter {
   _addMouseHelper(roadmap, svg, xScale, barHeight, sidePadding) {
     let _this = this;
     const mouseBoxHeight = Math.min(20, barHeight);
-    let verticalMouse = svg.append("line")
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", 0)
-      .attr("y2", 0)
-      .style("stroke", "black")
-      .style("stroke-width", "1px")
-      .style("stroke-dasharray", "2,2")
-      .style("shape-rendering", "crispEdges")
-      .style("pointer-events", "none")
-      .style("display", "none");
+    let verticalMouse = svg.append('line')
+      .attr('x1', 0)
+      .attr('y1', 0)
+      .attr('x2', 0)
+      .attr('y2', 0)
+      .style('stroke', 'black')
+      .style('stroke-width', '1px')
+      .style('stroke-dasharray', '2,2')
+      .style('shape-rendering', 'crispEdges')
+      .style('pointer-events', 'none')
+      .style('display', 'none');
 
-    let verticalMouseBox = svg.append("rect")
-      .attr("rx", 3)
-      .attr("ry", 3)
-      .attr("width", 50)
-      .attr("height", mouseBoxHeight)
-      .attr("stroke", "none")
-      .attr("fill", "black")
-      .attr("fill-opacity", 0.8)
-      .style("display", "none");
+    let verticalMouseBox = svg.append('rect')
+      .attr('rx', 3)
+      .attr('ry', 3)
+      .attr('width', 50)
+      .attr('height', mouseBoxHeight)
+      .attr('stroke', 'none')
+      .attr('fill', 'black')
+      .attr('fill-opacity', 0.8)
+      .style('display', 'none');
 
-    let verticalMouseText = svg.append("text")
-      .attr("font-size", 11)
-      .attr("font-weight", "bold")
-      .attr("text-anchor", "middle")
-      .attr("text-height", mouseBoxHeight)
-      .attr("fill", "white")
-      .style("display", "none");
+    let verticalMouseText = svg.append('text')
+      .attr('font-size', 11)
+      .attr('font-weight', 'bold')
+      .attr('text-anchor', 'middle')
+      .attr('text-height', mouseBoxHeight)
+      .attr('fill', 'white')
+      .style('display', 'none');
 
     const verticalMouseTopPadding = 40;
 
-    svg.on("mousemove", function () {
+    svg.on('mousemove', function () {
       let xCoord = d3.mouse(this)[0],
         yCoord = d3.mouse(this)[1];
 
       if (xCoord > sidePadding) {
         verticalMouse
-          .attr("x1", xCoord)
-          .attr("y1", 10)
-          .attr("x2", xCoord)
-          .attr("y2", svg.attr("height") - 20)
-          .style("display", "block");
+          .attr('x1', xCoord)
+          .attr('y1', 10)
+          .attr('x2', xCoord)
+          .attr('y2', svg.attr('height') - 20)
+          .style('display', 'block');
 
         verticalMouseBox
-          .attr("x", xCoord - 25)
-          .attr("y", yCoord - (mouseBoxHeight + 8) / 2 + verticalMouseTopPadding)
-          .style("display", "block");
+          .attr('x', xCoord - 25)
+          .attr('y', yCoord - (mouseBoxHeight + 8) / 2 + verticalMouseTopPadding)
+          .style('display', 'block');
 
         verticalMouseText
-          .attr("transform", "translate(" + xCoord + "," + (yCoord + verticalMouseTopPadding) + ")")
+          .attr('transform', 'translate(' + xCoord + ',' + (yCoord + verticalMouseTopPadding) + ')')
           .text(d3.timeFormat(_this.style.timeFormat)(xScale.invert(xCoord - sidePadding)))
-          .style("display", "block");
+          .style('display', 'block');
       } else {
-        verticalMouse.style("display", "none");
-        verticalMouseBox.style("display", "none");
-        verticalMouseText.style("display", "none");
+        verticalMouse.style('display', 'none');
+        verticalMouseBox.style('display', 'none');
+        verticalMouseText.style('display', 'none');
       }
     });
 
-    svg.on("mouseleave", function() {
-      verticalMouse.style("display", "none");
-      verticalMouseBox.style("display", "none");
-      verticalMouseText.style("display", "none");
+    svg.on('mouseleave', function() {
+      verticalMouse.style('display', 'none');
+      verticalMouseBox.style('display', 'none');
+      verticalMouseText.style('display', 'none');
     });
 
     svg.on('contextmenu', function() {
       d3.event.preventDefault();
       let contextMenu = new ContextMenu([
         {
-          label: "copy json data to clip board",
+          label: 'copy json data to clip board',
           cb: function (e) {
-            let dummy = document.createElement("input");
+            let dummy = document.createElement('input');
             document.body.appendChild(dummy);
-            dummy.setAttribute("id", "copy-dummy");
-            document.getElementById("copy-dummy").value = roadmap.toString();
+            dummy.setAttribute('id', 'copy-dummy');
+            document.getElementById('copy-dummy').value = roadmap.toString();
             dummy.select();
-            document.execCommand("copy");
+            document.execCommand('copy');
             document.body.removeChild(dummy);
           }
         }
