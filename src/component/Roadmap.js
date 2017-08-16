@@ -58,6 +58,16 @@ export class Roadmap {
   }
 
   /**
+   * @param {string} type
+   * @return {RoadmapTask[]}
+   */
+  getGroupSortedTasks(type) {
+    return this.getSortedGroups(type).reduce((tasks, group) => {
+      return tasks.concat(this.getSortedTasksByGroup(group));
+    }, []);
+  }
+
+  /**
    * @param {AbstractRoadmapGroup} group
    * @returns {RoadmapTask[]}
    */
@@ -77,7 +87,7 @@ export class Roadmap {
    * @param {string} type
    * @returns {AbstractRoadmapGroup[]}
    */
-  getSortedGroup(type) {
+  getSortedGroups(type) {
     const groups = (() => {
       switch (type) {
         case AbstractRoadmapGroup.TYPE.STORY:
