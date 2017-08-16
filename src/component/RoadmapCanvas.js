@@ -35,15 +35,15 @@ export class RoadmapCanvas extends EventEmitter {
     const tasks = groups.reduce((tasks, group) => tasks.concat(roadmap.getSortedTasksByGroup(group)), []);
 
     const svg = this._appendSVG();
-    const marginTop = this._getXAxisHeight(svg, tasks);
+    const marginBottom = this._getXAxisHeight(svg, tasks);
     const marginLeft = this._getYAxisWidth(svg, groups);
 
     const w = this.targetElement.node().clientWidth - marginLeft;
-    const h = tasks.length * this.style.gap + 40 - marginTop;
+    const h = (tasks.length * this.style.barHeight) + (tasks.length + 1) * this.style.barHeight * this.style.barPadding;
     svg
       .attr('width', w)
       .attr('height', h)
-      .attr('transform', `translate(${marginLeft}, ${marginTop})`);
+      .attr('style', `padding: 0 0 ${marginBottom}px ${marginLeft}px`);
 
     // create chart.
     const xScale = this._generateXAxisScale(tasks, w);
@@ -53,16 +53,14 @@ export class RoadmapCanvas extends EventEmitter {
     this._appendTaskLines(tasks, svg, xScale, yScale);
 
     // utility.
-    this._addMouseHelper(roadmap, svg, xScale, yScale);
+    this._addMouseHelper(roadmap, svg, xScale, yScale, marginLeft);
   }
 
   /**
-   * @param {number} w
-   * @param {number} h
    * @returns {selection}
    * @private
    */
-  _appendSVG(w, h) {
+  _appendSVG() {
     this.targetElement.selectAll('*').remove();
     return this.targetElement.append('svg').attr('style', 'overflow: visible');
   }
@@ -91,7 +89,7 @@ export class RoadmapCanvas extends EventEmitter {
 
     const width = fakeYAxis.node().getBBox().width;
     fakeYAxis.remove();
-    return width + 12;
+    return width;
   }
 
   /**
@@ -108,9 +106,7 @@ export class RoadmapCanvas extends EventEmitter {
       .data(tasks)
       .enter()
       .append('text')
-      .text(function(d) {
-        return d3.timeParse(this.style.timeFormat)(d.to);
-      })
+      .text('dummy')
       .style('text-anchor', 'middle')
       .attr('fill', '#000')
       .attr('stroke', 'none')
@@ -119,7 +115,7 @@ export class RoadmapCanvas extends EventEmitter {
 
     const height = fakeXAxis.node().getBBox().height;
     fakeXAxis.remove();
-    return height + 12;
+    return height;
   }
 
   /**
@@ -131,7 +127,8 @@ export class RoadmapCanvas extends EventEmitter {
   _generateYAxisScale(tasks, h) {
     return d3.scaleBand()
       .domain(Object.keys(tasks).map( (i) => parseInt(i, 10)))
-      .range([0, h]);
+      .range([0, h])
+      .padding([this.style.barPadding]);
   }
 
   /**
@@ -174,6 +171,7 @@ export class RoadmapCanvas extends EventEmitter {
           .tickFormat(function (d) {
             return yAxisMap[d];
           })
+          .tickSize(0)
       );
   }
 
@@ -186,7 +184,7 @@ export class RoadmapCanvas extends EventEmitter {
   _appendXAxis(svg, xScale, h) {
     let xAxis = d3.axisBottom(xScale)
       .ticks(this.style.tickInterval)
-      .tickSize(- svg.attr('height'), 0, 0)
+      .tickSize(- h, 0, 0)
       .tickFormat(this.style.timeFormat);
     let xAxisGroup = svg.append('g')
       .attr('transform', 'translate(0,' + h + ')')
@@ -229,13 +227,15 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _appendTaskLines(tasks, svg, xScale, yScale) {
-    let rectangles = svg.append('g')
-      .attr('class', 'bars')
-      .selectAll('rect')
+    const bar = svg
+      .append('g')
+      .attr('class', 'bar-area')
+      .selectAll('.bar-area')
       .data(tasks)
-      .enter();
-
-    rectangles.append('rect')
+      .enter()
+      .append('g')
+      .attr('class', 'bar');
+    bar.append('rect')
       .attr('rx', 3)
       .attr('ry', 3)
       .attr('x', function(d){
@@ -261,21 +261,20 @@ export class RoadmapCanvas extends EventEmitter {
       });
 
     // Draw items texts
-    rectangles.append('text')
+    bar.append('text')
       .text(function(d){
         return d.name;
       })
+      .attr('font-size', yScale.bandwidth() / 2)
+      .attr('text-anchor', 'middle')
+      .attr('fill', '#000')
+      .style('pointer-events', 'none')
       .attr('x', function(d){
         return xScale(d.from) + (xScale(d.to) - xScale(d.from)) / 2;
       })
       .attr('y', function(d, i){
-        return yScale(i) + yScale.bandwidth() / 2;
-      })
-      .attr('font-size', 11)
-      .attr('text-anchor', 'middle')
-      .attr('text-height', yScale.bandwidth())
-      .attr('fill', '#000')
-      .style('pointer-events', 'none');
+        return yScale(i) + yScale.bandwidth() / 2 + this.getBBox().height / 4;
+      });
   }
 
   /**
