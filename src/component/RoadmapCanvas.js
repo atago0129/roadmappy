@@ -32,33 +32,28 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _render(roadmap, groups) {
-    let groupTasks = [];
-    for (let i = 0; i < groups.length; i++) {
-      groupTasks = groupTasks.concat(roadmap.getSortedTasksByGroup(groups[i]));
-    }
+    const tasks = groups.reduce((tasks, group) => tasks.concat(roadmap.getSortedTasksByGroup(group)), []);
 
-    const w = this.targetElement.node().clientWidth;
-    const h = groupTasks.length * this.style.gap + 40;
+    const svg = this._appendSVG();
+    const marginTop = this._getXAxisHeight(svg, tasks);
+    const marginLeft = this._getYAxisWidth(svg, groups);
 
-    let svg = this._appendSVG(w, h);
+    const w = this.targetElement.node().clientWidth - marginLeft;
+    const h = tasks.length * this.style.gap + 40 - marginTop;
+    svg
+      .attr('width', w)
+      .attr('height', h)
+      .attr('transform', `translate(${marginLeft}, ${marginTop})`);
 
-    let yAxisLabels = this._appendYAxisLabels(roadmap, groups, svg, this.style.gap, this.style.topPadding);
+    // create chart.
+    const xScale = this._generateXAxisScale(tasks, w);
+    const yScale = this._generateYAxisScale(tasks, h);
+    this._appendXAxis(svg, xScale, h);
+    this._appendYAxis(roadmap, groups, svg, yScale);
+    this._appendTaskLines(tasks, svg, xScale, yScale);
 
-    let sidePadding = yAxisLabels.node().parentNode.getBBox().width + 15;
-
-    yAxisLabels.remove();
-
-    svg.attr('transform', 'translate(' + sidePadding + ', ' + this.style.topPadding + ')');
-
-    let xAxisScale = this._generateXAxisScale(groupTasks, w, sidePadding);
-    let yAxisScale = this._generateYAxisScale(groupTasks, svg.attr('height'));
-
-    this._appendXAxis(svg, xAxisScale, sidePadding, this.style.topPadding, svg.attr('height'));
-    this._appendYAxis(roadmap, groups, svg, yAxisScale);
-
-    this._appendItemLines(groupTasks, svg, xAxisScale, yAxisScale, this.style.gap, sidePadding, this.style.topPadding, this.style.barHeight);
-
-    this._addMouseHelper(roadmap, svg, xAxisScale, this.style.barHeight, sidePadding);
+    // utility.
+    this._addMouseHelper(roadmap, svg, xScale, yScale);
   }
 
   /**
@@ -69,12 +64,62 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _appendSVG(w, h) {
     this.targetElement.selectAll('*').remove();
+    return this.targetElement.append('svg').attr('style', 'overflow: visible');
+  }
 
-    let svg = this.targetElement.append('svg').attr('width', w).attr('style', 'overflow: visible');
-    svg.attr('height', function() {
-      return parseInt(svg.attr('height') || 0, 10) + h;
-    });
-    return svg;
+  /**
+   * @param {selection} svg
+   * @param {AbstractRoadmapGroup[]} groups
+   * @return {number}
+   */
+  _getYAxisWidth(svg, groups) {
+    const fakeYAxis = svg.append('g')
+      .attr('class', 'fake-y-axis-group')
+
+    fakeYAxis
+      .selectAll('text')
+      .data(groups)
+      .enter()
+      .append('text')
+      .text(function(d){
+        return d.name;
+      })
+      .attr('font-size', 11)
+      .attr('text-anchor', 'start')
+      .attr('text-height', 14)
+      .attr('fill', '#000');
+
+    const width = fakeYAxis.node().getBBox().width;
+    fakeYAxis.remove();
+    return width + 12;
+  }
+
+  /**
+   * @param {selection} svg
+   * @param {RoadmapTask[]} tasks
+   * @return {number}
+   */
+  _getXAxisHeight(svg, tasks) {
+    const fakeXAxis = svg.append('g')
+      .attr('class', 'fake-x-axis-group')
+
+    fakeXAxis
+      .selectAll('text')
+      .data(tasks)
+      .enter()
+      .append('text')
+      .text(function(d) {
+        return d3.timeParse(this.style.timeFormat)(d.to);
+      })
+      .style('text-anchor', 'middle')
+      .attr('fill', '#000')
+      .attr('stroke', 'none')
+      .attr('font-size', 10)
+      .attr('dy', '1em');
+
+    const height = fakeXAxis.node().getBBox().height;
+    fakeXAxis.remove();
+    return height + 12;
   }
 
   /**
@@ -85,10 +130,22 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _generateYAxisScale(tasks, h) {
     return d3.scaleBand()
-      .domain(Object.keys(tasks).map(function (i) {
-        return parseInt(i, 10);
-      }))
+      .domain(Object.keys(tasks).map( (i) => parseInt(i, 10)))
       .range([0, h]);
+  }
+
+  /**
+   * @param {RoadmapTask[]} tasks
+   * @param {number} w
+   * @private
+   */
+  _generateXAxisScale(tasks, w) {
+    return d3.scaleTime()
+      .domain([
+        d3.min(tasks, (d) => d.from),
+        d3.max(tasks, (d) => d.to)
+      ])
+      .rangeRound([0, w]);
   }
 
   /**
@@ -99,125 +156,34 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _appendYAxis(roadmap, groups, svg, yScale) {
-    let yAxisMap = [];
-    let count = 0;
-    for (let i = 0; i < groups.length; i++) {
-      let _tasks = roadmap.getSortedTasksByGroup(groups[i]);
-      for (let j = 0; j < _tasks.length; j++) {
-        if (j === 0) {
-          yAxisMap[count] = groups[i].name;
-        } else {
-          yAxisMap[count] = '';
+    const yAxisMap = groups.reduce((labels, group) => {
+      let isFirstTaskPerGroup = true;
+      return labels.concat(roadmap.getSortedTasksByGroup(group).map((task) => {
+        if (isFirstTaskPerGroup) {
+          isFirstTaskPerGroup = false;
+          return group.name;
         }
-        count++;
-      }
-    }
-    let yAxis = d3.axisLeft(yScale)
-      .tickFormat(function (d) {
-        return yAxisMap[d];
-      });
+        return '';
+      }));
+    }, []);
+
     svg.append('g')
-      .call(yAxis);
-  }
-
-  /**
-   * @param {Roadmap} roadmap
-   * @param {AbstractRoadmapGroup[]} groups
-   * @param {selection} svg
-   * @param {number} gap
-   * @param {number} topPadding
-   * @param {number} w
-   * @private
-   */
-  _appendYAxisBoxes(roadmap, groups, svg, gap, topPadding, w) {
-    return svg.append('g')
-      .selectAll('rect')
-      .data(groups)
-      .enter()
-      .append('rect')
-      .attr('rx', 3)
-      .attr('ry', 3)
-      .attr('x', 0)
-      .attr('y', function(d, index){
-        // Shift y direction for all previous task length
-        let total = 0;
-        for (let i = 0; i < index; i++) {
-          total += roadmap.getSortedTasksByGroup(groups[i]).length;
-        }
-        return total * gap + topPadding;
-      })
-      .attr('width', function(){
-        return w;
-      })
-      .attr('height', function(d) {
-        return roadmap.getSortedTasksByGroup(d).length * gap - 4;
-      })
-      .attr('stroke', 'none')
-      .attr('fill', '#999')
-      .attr('fill-opacity', 0.1);
-  }
-
-  /**
-   * @param {Roadmap} roadmap
-   * @param {AbstractRoadmapGroup[]} groups
-   * @param {selection} svg
-   * @param {number} gap
-   * @param {number} topPadding
-   * @returns {selection}
-   * @private
-   */
-  _appendYAxisLabels(roadmap, groups, svg, gap, topPadding) {
-    return svg.append('g')
-      .selectAll('text')
-      .data(groups)
-      .enter()
-      .append('text')
-      .text(function(d){
-        return d.name;
-      })
-      .attr('x', 10)
-      .attr('y', function(d, index){
-        // Shift y direction for all previous task length
-        let total = 0;
-        for (let i = 0; i < index; i++) {
-          total += roadmap.getSortedTasksByGroup(groups[i]).length;
-        }
-        return roadmap.getSortedTasksByGroup(d).length * gap / 2 + total * gap + topPadding + 2;
-      })
-      .attr('font-size', 11)
-      .attr('text-anchor', 'start')
-      .attr('text-height', 14)
-      .attr('fill', '#000');
-  }
-
-  /**
-   * @param {RoadmapTask[]} tasks
-   * @param {number} w
-   * @param {number} sidePadding
-   * @private
-   */
-  _generateXAxisScale(tasks, w, sidePadding) {
-    return d3.scaleTime()
-      .domain([
-        d3.min(tasks, function(d) {
-          return d.from;
-        }),
-        d3.max(tasks, function(d) {
-          return d.to;
-        })
-      ])
-      .rangeRound([0, w - sidePadding - 15]);
+      .attr('class', 'y-axis-group')
+      .call(
+        d3.axisLeft(yScale)
+          .tickFormat(function (d) {
+            return yAxisMap[d];
+          })
+      );
   }
 
   /**
    * @param {selection} svg
    * @param {selection} xScale
-   * @param {number} sidePadding
-   * @param {number} topPadding
    * @param {number} h
    * @private
    */
-  _appendXAxis(svg, xScale, sidePadding, topPadding, h) {
+  _appendXAxis(svg, xScale, h) {
     let xAxis = d3.axisBottom(xScale)
       .ticks(this.style.tickInterval)
       .tickSize(- svg.attr('height'), 0, 0)
@@ -247,8 +213,7 @@ export class RoadmapCanvas extends EventEmitter {
         .attr('y1', 0)
         .attr('x2', xScale(now))
         .attr('y2', -h)
-        .attr('class', 'now');
-      xAxisGroup.selectAll('.now')
+        .attr('class', 'now')
         .attr('stroke', 'red')
         .attr('opacity', 0.5)
         .attr('stroke-dasharray', '2,2')
@@ -261,16 +226,11 @@ export class RoadmapCanvas extends EventEmitter {
    * @param {selection} svg
    * @param {selection} xScale
    * @param {selection} yScale
-   * @param {number} gap
-   * @param {number} sidePadding
-   * @param {number} topPadding
-   * @param {number} barHeight
    * @private
    */
-  _appendItemLines(tasks, svg, xScale, yScale, gap, sidePadding, topPadding, barHeight) {
+  _appendTaskLines(tasks, svg, xScale, yScale) {
     let rectangles = svg.append('g')
       .attr('class', 'bars')
-      // .attr('transform', 'translate(' + sidePadding + ', 0)')
       .selectAll('rect')
       .data(tasks)
       .enter();
@@ -313,7 +273,7 @@ export class RoadmapCanvas extends EventEmitter {
       })
       .attr('font-size', 11)
       .attr('text-anchor', 'middle')
-      .attr('text-height', barHeight)
+      .attr('text-height', yScale.bandwidth())
       .attr('fill', '#000')
       .style('pointer-events', 'none');
   }
@@ -322,13 +282,13 @@ export class RoadmapCanvas extends EventEmitter {
    * @param {Roadmap} roadmap
    * @param {selection} svg
    * @param {selection} xScale
-   * @param {number} barHeight
+   * @param {selection} yScale
    * @param {number} sidePadding
    * @private
    */
-  _addMouseHelper(roadmap, svg, xScale, barHeight, sidePadding) {
+  _addMouseHelper(roadmap, svg, xScale, yScale, sidePadding) {
     let _this = this;
-    const mouseBoxHeight = Math.min(20, barHeight);
+    const mouseBoxHeight = Math.min(20, yScale.bandwidth());
     let verticalMouse = svg.append('line')
       .attr('x1', 0)
       .attr('y1', 0)
