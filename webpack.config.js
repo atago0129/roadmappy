@@ -14,7 +14,7 @@ module.exports = {
     umdNamedDefine: true
   },
 
-  devtool: 'sourcemap',
+  devtool: 'source-map',
 
   devServer: {
     contentBase: 'debug/',
