@@ -47,10 +47,9 @@ export class RoadmapCanvas extends EventEmitter {
     let sidePadding = yAxisLabels.node().parentNode.getBBox().width + 15;
 
     yAxisLabels.remove();
-    console.log(111);
 
     svg.attr('transform', 'translate(' + sidePadding + ', ' + this.style.topPadding + ')');
-    console.log(222);
+
     let xAxisScale = this._generateXAxisScale(groupTasks, w, sidePadding);
     let yAxisScale = this._generateYAxisScale(groupTasks, svg.attr('height'));
 
@@ -86,8 +85,8 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _generateYAxisScale(tasks, h) {
     return d3.scaleBand()
-      .domain(tasks.map(function (task) {
-        return task.id;
+      .domain(Object.keys(tasks).map(function (i) {
+        return parseInt(i, 10);
       }))
       .range([0, h]);
   }
@@ -101,14 +100,16 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _appendYAxis(roadmap, groups, svg, yScale) {
     let yAxisMap = [];
+    let count = 0;
     for (let i = 0; i < groups.length; i++) {
       let _tasks = roadmap.getSortedTasksByGroup(groups[i]);
       for (let j = 0; j < _tasks.length; j++) {
         if (j === 0) {
-          yAxisMap[_tasks[j].id] = groups[i].name;
+          yAxisMap[count] = groups[i].name;
         } else {
-          yAxisMap[_tasks[j].id] = '';
+          yAxisMap[count] = '';
         }
+        count++;
       }
     }
     let yAxis = d3.axisLeft(yScale)
@@ -281,7 +282,7 @@ export class RoadmapCanvas extends EventEmitter {
         return xScale(d.from);
       })
       .attr('y', function(d, i){
-        return yScale(d.id);
+        return yScale(i);
       })
       .attr('width', function(d){
         return xScale(d.to) - xScale(d.from);
@@ -307,8 +308,8 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('x', function(d){
         return xScale(d.from) + (xScale(d.to) - xScale(d.from)) / 2;
       })
-      .attr('y', function(d){
-        return yScale(d.id) + yScale.bandwidth() / 2;
+      .attr('y', function(d, i){
+        return yScale(i) + yScale.bandwidth() / 2;
       })
       .attr('font-size', 11)
       .attr('text-anchor', 'middle')
