@@ -227,54 +227,44 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _appendTaskLines(tasks, svg, xScale, yScale) {
-    const bar = svg
+    const bars = svg
       .append('g')
-      .attr('class', 'bar-area')
-      .selectAll('.bar-area')
+      .attr('class', 'bar-group')
+      .selectAll('svg')
       .data(tasks)
       .enter()
-      .append('g')
-      .attr('class', 'bar');
-    bar.append('rect')
+      .append('svg');
+
+    // create bar boxes.
+    bars
+      .attr('class', 'bar')
+      .attr('width', (d) => xScale(d.to) - xScale(d.from))
+      .attr('height', yScale.bandwidth())
+      .attr('x', (d) => xScale(d.from))
+      .attr('y', (d, i) => yScale(i));
+
+    // fill rectangle.
+    bars.append('rect')
+      .attr('width', '100%')
+      .attr('height', '100%')
       .attr('rx', 3)
       .attr('ry', 3)
-      .attr('x', function(d){
-        return xScale(d.from);
-      })
-      .attr('y', function(d, i){
-        return yScale(i);
-      })
-      .attr('width', function(d){
-        return xScale(d.to) - xScale(d.from);
-      })
-      .attr('height', yScale.bandwidth())
       .attr('stroke', 'none')
-      .attr('fill', function(d) {
-        return d.pattern || d.color;
-      })
+      .attr('fill', (d) => d.pattern || d.color)
       .attr('fill-opacity', 0.5)
       .on('click', (task) => {
         this.emit('click:task', task);
-      })
-      .on('mouseover', function() {
-        d3.select(this).style({cursor:'pointer'});
       });
 
-    // Draw items texts
-    bar.append('text')
-      .text(function(d){
-        return d.name;
-      })
-      .attr('font-size', yScale.bandwidth() / 2)
+    // append texts.
+    bars.append('text')
+      .text((d) => d.name)
+      .attr('x', '50%')
+      .attr('y', '50%')
       .attr('text-anchor', 'middle')
-      .attr('fill', '#000')
-      .style('pointer-events', 'none')
-      .attr('x', function(d){
-        return xScale(d.from) + (xScale(d.to) - xScale(d.from)) / 2;
-      })
-      .attr('y', function(d, i){
-        return yScale(i) + yScale.bandwidth() / 2 + this.getBBox().height / 4;
-      });
+      .attr('alignment-baseline', 'central')
+      .attr('font-size', yScale.bandwidth() / 2)
+      .attr('fill', '#000');
   }
 
   /**
