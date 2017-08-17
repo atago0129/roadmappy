@@ -1,5 +1,7 @@
 const webpack = require('webpack');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 module.exports = {
 
   entry: {
@@ -49,10 +51,15 @@ module.exports = {
     }]
   },
 
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin(),
-    new webpack.HotModuleReplacementPlugin()
-  ]
+  plugins: [].concat(
+    isProduction
+      ? [
+        new webpack.optimize.UglifyJsPlugin()
+      ]
+      : [
+        new webpack.HotModuleReplacementPlugin()
+      ]
+  )
 
 };
 

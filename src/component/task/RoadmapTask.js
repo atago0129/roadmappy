@@ -47,6 +47,7 @@ export class RoadmapTask {
   }
 
   set from(from) {
+    from = this._fixDate(from);
     if ((from.getTime() - this.to.getTime()) > -ONE_DAY) {
       this._to = new Date(from.getTime() + ONE_DAY);
     }
@@ -54,12 +55,16 @@ export class RoadmapTask {
   }
 
   set to(to) {
+    to = this._fixDate(to);
     if ((this.from.getTime() - to.getTime()) > -ONE_DAY) {
       this._from = new Date(to.getTime() - ONE_DAY);
     }
     this._to = to;
   }
 
+  _fixDate(date) {
+    return new Date(date.getTime() - (date.getTime() % ONE_DAY));
+  }
 
 }
 

@@ -4,7 +4,8 @@ import ContextMenu from 'd3-v4-contextmenu';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
 export class RoadmapCanvas extends EventEmitter {
-  type;
+
+  roadmap;
   element;
   style;
 
@@ -16,7 +17,6 @@ export class RoadmapCanvas extends EventEmitter {
     super();
 
     this.roadmap = roadmap;
-    this.type = option.type;
     this.element = d3.select(option.targetElementId);
     this.style = option.style;
     this._init();
@@ -33,14 +33,15 @@ export class RoadmapCanvas extends EventEmitter {
     this.xAxis = this._createXAxis();
     this.yAxis = this._createYAxis();
     this.barArea = this._createBarArea();
+    this.roadmap.reorder();
   }
 
   /**
    * @param {Roadmap} roadmap
    */
   render() {
-    const groups = this.roadmap.getSortedGroups(this.type);
-    const tasks = this.roadmap.getGroupSortedTasks(this.type);
+    const groups = this.roadmap.getGroups();
+    const tasks = this.roadmap.getTasks();
 
     const marginBottom = this._getXAxisHeight(tasks);
     const marginLeft = this._getYAxisWidth(groups);
@@ -90,11 +91,19 @@ export class RoadmapCanvas extends EventEmitter {
    * @return {selection}
    */
   _createBarArea() {
-    return this.svg.append('svg')
+    const barArea = this.svg.append('svg')
       .style('overflow', 'visible')
       .attr('class', 'bar-area')
       .attr('width', '100%')
       .attr('height', '100%');
+    barArea.append('rect')
+      .attr('class', 'bax-area-background')
+      .attr('fill', 'transparent')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', '100%')
+      .attr('height', '100%')
+    return barArea;
   }
 
   /**
@@ -163,9 +172,9 @@ export class RoadmapCanvas extends EventEmitter {
       d3.axisLeft(this.yScale)
       .tickSize(0)
       .tickFormat((d) => {
-        const yAxisMap = this.roadmap.getSortedGroups(this.type).reduce((labels, group) => {
+        const yAxisMap = this.roadmap.getGroups().reduce((labels, group) => {
           let isFirstTaskPerGroup = true;
-          return labels.concat(this.roadmap.getSortedTasksByGroup(group).map((task) => {
+          return labels.concat(this.roadmap.getTasksByGroup(group).map((task) => {
             if (isFirstTaskPerGroup) {
               isFirstTaskPerGroup = false;
               return group.name;
@@ -185,27 +194,23 @@ export class RoadmapCanvas extends EventEmitter {
   _updateTaskBars(tasks) {
     const _this = this;
 
-    const bars = this.barArea
-      .selectAll('.bar')
-      .data(tasks);
+    const bars = this.barArea.selectAll('.bar').data(tasks);
 
     // ENTER.
     // ------------------------------------------------------------
-    const bar = bars.enter()
+    const enter = bars.enter()
       .append('svg')
       .attr('class', 'bar');
-    bar.append('rect')
+    enter.append('rect')
       .attr('class', 'bar-background')
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr('rx', 3)
-      .attr('ry', 3)
+      .attr('rx', 2)
+      .attr('ry', 2)
       .attr('stroke', 'none')
       .attr('fill-opacity', 0.5)
-      .on('click', (task) => {
-        this.emit('click:task', task);
-      });
-    bar.append('text')
+      .on('click', (d) =>  this.emit('click:task', d));
+    enter.append('text')
       .attr('class', 'bar-label')
       .attr('x', '50%')
       .attr('y', '50%')
@@ -217,17 +222,12 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .on('start', function(d) {
-            _this.emit('drag:start:task', d, {x: d3.event.x, y: d3.event.y});
-          })
-          .on('drag', function(d) {
-            _this.emit('drag:drag:task', d, {x: d3.event.x, y: d3.event.y});
-          })
-          .on('end', function(d) {
-            _this.emit('drag:end:task', d, {x: d3.event.x, y: d3.event.y});
-          })
+          .subject(() => this._getDraggingTask(d3.event.y))
+          .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
-    bar.append('text')
+    enter.append('text')
       .attr('class', 'bar-to-handle')
       .text('»')
       .attr('x', '100%')
@@ -240,17 +240,12 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .on('start', function(d) {
-            _this.emit('drag:start:task:to', d, {x: d3.event.x, y: d3.event.y});
-          })
-          .on('drag', function(d) {
-            _this.emit('drag:drag:task:to', d, {x: d3.event.x, y: d3.event.y});
-          })
-          .on('end', function(d) {
-            _this.emit('drag:end:task:to', d, {x: d3.event.x, y: d3.event.y});
-          })
+          .subject(() => this._getDraggingTask(d3.event.y))
+          .on('start', (d) => this.emit('drag:start:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => this.emit('drag:drag:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('end', (d) => this.emit('drag:end:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
-    bar.append('text')
+    enter.append('text')
       .attr('class', 'bar-from-handle')
       .text('«')
       .attr('x', '0')
@@ -263,130 +258,31 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .on('start', function(d) {
-            _this.emit('drag:start:task:from', d, {x: d3.event.x, y: d3.event.y});
-          })
-          .on('drag', function(d) {
-            _this.emit('drag:drag:task:from', d, {x: d3.event.x, y: d3.event.y});
-          })
-          .on('end', function(d) {
-            _this.emit('drag:end:task:from', d, {x: d3.event.x, y: d3.event.y});
-          })
+          .subject(() => this._getDraggingTask(d3.event.y))
+          .on('start', (d) => this.emit('drag:start:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => this.emit('drag:drag:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('end', (d) => this.emit('drag:end:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
 
 
     // UPDATE.
     // ------------------------------------------------------------
-    bars.merge(bar)
+    const update = bars.merge(enter)
       .attr('width', (d) => this.xScale(d.to) - this.xScale(d.from))
       .attr('height', this.yScale.bandwidth())
       .attr('x', (d) => this.xScale(d.from))
       .attr('y', (d, i) => this.yScale(i));
-    bars.merge(bar)
-      .selectAll('.bar-background')
-      .attr('fill', (d) => d.pattern || d.color);
-    bars.merge(bar)
-      .selectAll('.bar-label')
-      .text((d) => d.name);
+    update
+      .select('.bar-background')
+      .attr('fill', (d) => d.color);
+    update
+      .select('.bar-label')
+      .text((d) =>  d.name);
 
     // EXIT.
     // ------------------------------------------------------------
     bars.exit()
       .remove();
-  }
-
-  /**
-   * @param {Roadmap} roadmap
-   * @param {number} sidePadding
-   * @private
-   */
-  _addMouseHelper(sidePadding) {
-    const _this = this;
-    const mouseBoxHeight = this.yScale.bandwidth();
-    const verticalMouse = this.svg.append('line')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', 0)
-      .attr('y2', 0)
-      .style('stroke', 'black')
-      .style('stroke-width', '1px')
-      .style('stroke-dasharray', '2,2')
-      .style('shape-rendering', 'crispEdges')
-      .style('pointer-events', 'none')
-      .style('display', 'none');
-
-    const verticalMouseBox = this.svg.append('rect')
-      .attr('rx', 3)
-      .attr('ry', 3)
-      .attr('width', 50)
-      .attr('height', mouseBoxHeight)
-      .attr('stroke', 'none')
-      .attr('fill', 'black')
-      .attr('fill-opacity', 0.8)
-      .style('display', 'none');
-
-    const verticalMouseText = this.svg.append('text')
-      .attr('font-size', 11)
-      .attr('font-weight', 'bold')
-      .attr('text-anchor', 'middle')
-      .attr('text-height', mouseBoxHeight)
-      .attr('fill', 'white')
-      .style('display', 'none');
-
-    const verticalMouseTopPadding = 40;
-
-    this.svg.on('mousemove', function () {
-      const xCoord = d3.mouse(this)[0];
-      const yCoord = d3.mouse(this)[1];
-
-      if (xCoord > sidePadding) {
-        verticalMouse
-          .attr('x1', xCoord)
-          .attr('y1', 0)
-          .attr('x2', xCoord)
-          .attr('y2', _this.svg.attr('height'))
-          .style('display', 'block');
-
-        verticalMouseBox
-          .attr('x', xCoord - 25)
-          .attr('y', yCoord - (mouseBoxHeight + 8) / 2 + verticalMouseTopPadding)
-          .style('display', 'block');
-
-        verticalMouseText
-          .attr('transform', 'translate(' + xCoord + ',' + (yCoord + verticalMouseTopPadding) + ')')
-          .text(d3.timeFormat(_this.style.timeFormat)(_this.xScale.invert(xCoord - sidePadding)))
-          .style('display', 'block');
-      } else {
-        verticalMouse.style('display', 'none');
-        verticalMouseBox.style('display', 'none');
-        verticalMouseText.style('display', 'none');
-      }
-    });
-
-    this.svg.on('mouseleave', function() {
-      verticalMouse.style('display', 'none');
-      verticalMouseBox.style('display', 'none');
-      verticalMouseText.style('display', 'none');
-    });
-
-    this.svg.on('contextmenu', function() {
-      d3.event.preventDefault();
-      const contextMenu = new ContextMenu([
-        {
-          label: 'copy json data to clip board',
-          cb: function (e) {
-            const dummy = document.createElement('input');
-            document.body.appendChild(dummy);
-            dummy.setAttribute('id', 'copy-dummy');
-            document.getElementById('copy-dummy').value = _this.roadmap.toString();
-            dummy.select();
-            document.execCommand('copy');
-            document.body.removeChild(dummy);
-          }
-        }
-      ]);
-      contextMenu.show(_this.svg, d3.mouse(this)[0], d3.mouse(this)[1]);
-    });
   }
 
   /**
@@ -438,6 +334,11 @@ export class RoadmapCanvas extends EventEmitter {
     const height = fakeXAxis.node().getBBox().height;
     fakeXAxis.remove();
     return height;
+  }
+
+  _getDraggingTask(y) {
+    const step = this.yScale.step();
+    return this.roadmap.getTasks()[this.yScale.domain()[Math.floor(y / step)]];
   }
 
 }
