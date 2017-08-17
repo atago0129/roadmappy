@@ -1,5 +1,7 @@
 import {AbstractRoadmapGroup} from '../group/AbstractRoadmapGroup';
 
+const ONE_DAY = 1000 * 60 * 60 * 24;
+
 export class RoadmapTask {
   id;
   name;
@@ -29,10 +31,35 @@ export class RoadmapTask {
     this.assigneeIds = [].concat(assigneeIds || []);
     this.color = color;
     this.order = parseInt(order);
-    this.from = new Date(from);
-    this.to = new Date(new Date(to).setHours((new Date(to).getHours() + 24)));
     this.involvement = Math.min(parseInt(involvement), 100);
+    this._from = new Date(from);
+    this._to = new Date(new Date(to).setHours((new Date(to).getHours() + 24)));
+    this.from = this._from;
+    this.to = this._to;
   }
+
+  get from() {
+    return this._from;
+  }
+
+  get to() {
+    return this._to;
+  }
+
+  set from(from) {
+    if ((from.getTime() - this.to.getTime()) > -ONE_DAY) {
+      this._to = new Date(from.getTime() + ONE_DAY);
+    }
+    this._from = from;
+  }
+
+  set to(to) {
+    if ((this.from.getTime() - to.getTime()) > -ONE_DAY) {
+      this._from = new Date(to.getTime() - ONE_DAY);
+    }
+    this._to = to;
+  }
+
 
 }
 
