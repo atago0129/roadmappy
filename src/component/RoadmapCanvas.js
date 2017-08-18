@@ -239,7 +239,7 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .subject(() => this._invertYScale(d3.event.y))
+          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
           .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
@@ -257,7 +257,7 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .subject(() => this._invertYScale(d3.event.y))
+          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
           .on('start', (d) => this.emit('drag:start:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('drag', (d) => this.emit('drag:drag:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('end', (d) => this.emit('drag:end:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
@@ -275,7 +275,7 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .subject(() => this._invertYScale(d3.event.y))
+          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
           .on('start', (d) => this.emit('drag:start:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('drag', (d) => this.emit('drag:drag:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('end', (d) => this.emit('drag:end:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
