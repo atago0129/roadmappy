@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
@@ -26,45 +27,31 @@ export class Roadmap {
     this._tasks = this._tasks.concat(tasks || []);
     this._stories = this._stories.concat(stories || []);
     this._assignees = this._assignees.concat(assignees || []);
+    this._redefineRange();
   }
 
-  /**
-   * @param {RoadmapTask} task
-   */
-  addTask(task) {
-    this._tasks.push(task);
-  }
-
-  /**
-   * @param {RoadmapStory} story
-   */
-  addStory(story) {
-    this._stories.push(story);
-  }
-
-  /**
-   * @param {RoadmapAssignee} assignee
-   */
-  addAssignee(assignee) {
-    this._assignees.push(assignee);
-  }
-
-  /**
-   * @param {number} taskId
-   * @return {RoadmapTask|null}
-   */
-  getTaskById(taskId) {
-    return this._tasks.filter(function(task) {
-      return task.id === taskId;
-    }).pop() || null;
-  }
-
-  /**
-   * @param {number} i
-   * @return {RoadmapTask|null}
-   */
-  getTaskByIndex(i) {
-    return this._tasks[i];
+  _redefineRange() {
+    if (this._from === null && this._to === null) {
+      const now = new Date().getTime();
+      let from = new Date(now - ONE_DAY * 30);
+      let to = new Date(now + ONE_DAY * 30);
+      const taskFrom = d3.min(this._tasks, (d) => d.from);
+      const taskTo = d3.max(this._tasks, (d) => d.to);
+      if (taskTo.getTime() < from.getTime() || to.getTime() < taskFrom.getTime()) {
+        from = taskFrom;
+        to = new Date(taskFrom.getTime() + ONE_DAY * 30 * 2);
+      }
+      this._from = from;
+      this._to = to;
+      return;
+    }
+    if (this._from !== null && this._to === null) {
+      this._to = new Date(this._from.getTime() + ONE_DAY * 30 * 2);
+      return;
+    }
+    if (this._from === null && this._to !== null) {
+      this._from = new Date(this._to - ONE_DAY * 30 * 2);
+    }
   }
 
   /**
