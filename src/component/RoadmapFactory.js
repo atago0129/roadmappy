@@ -13,6 +13,8 @@ export class RoadmapFactory {
   create(option, dataSet) {
     return new Roadmap(
       option.type,
+      option.from,
+      option.to,
       this._createTasks(dataSet.tasks || []),
       this._createStories(dataSet.stories || []),
       this._createAssignees(dataSet.assignees || [])
