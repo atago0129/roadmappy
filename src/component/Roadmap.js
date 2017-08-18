@@ -1,20 +1,28 @@
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
+const ONE_DAY = 1000 * 60 * 60 * 24;
+
 export class Roadmap {
 
   _type = null;
+  _from = null;
+  _to = null;
   _tasks = [];
   _stories = [];
   _assignees = [];
 
   /**
    * @param {string} type
+   * @param {Date} from
+   * @param {Date} to
    * @param {RoadmapTask[]} tasks
    * @param {RoadmapStory[]} stories
    * @param {RoadmapAssignee[]} assignees
    */
-  constructor(type, tasks, stories, assignees) {
+  constructor(type, from, to, tasks, stories, assignees) {
     this._type = type || AbstractRoadmapGroup.TYPE.STORY;
+    this._from = from;
+    this._to = to;
     this._tasks = this._tasks.concat(tasks || []);
     this._stories = this._stories.concat(stories || []);
     this._assignees = this._assignees.concat(assignees || []);
@@ -145,6 +153,28 @@ export class Roadmap {
   toString() {
     // TODO: implements
     return 'call toString';
+  }
+
+  get from() {
+    return this._from;
+  }
+
+  get to() {
+    return this._to;
+  }
+
+  set from(from) {
+    if ((from.getTime() - this.to.getTime()) > -ONE_DAY) {
+      this._to = new Date(from.getTime() + ONE_DAY);
+    }
+    this._from = from;
+  }
+
+  set to(to) {
+    if ((this.from.getTime() - to.getTime()) > -ONE_DAY) {
+      this._from = new Date(to.getTime() - ONE_DAY);
+    }
+    this._to = to;
   }
 
 }
