@@ -1,8 +1,6 @@
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 import {RoadmapStyle} from './RoadmapStyle';
 
-const ONE_DAY = 1000 * 60 * 60 * 24;
-
 export class RoadmapOption {
   type;
   targetElementId;
@@ -13,8 +11,8 @@ export class RoadmapOption {
    */
   constructor(options) {
     this.type = AbstractRoadmapGroup.isValidType(options.type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
-    this.from =  new Date(new Date().getTime() - ONE_DAY * 30);
-    this.to = new Date(new Date().getTime() + ONE_DAY * 30);
+    this.from = options.hasOwnProperty('from') ? new Date(options.from) : null;
+    this.to = options.hasOwnProperty('to') ? new Date(options.to) : null;
     this.targetElementId = '#' + options.target;
     this.style = new RoadmapStyle(options.hasOwnProperty('style') ? options.style : {});
   }
