@@ -1,5 +1,3 @@
-import {AbstractRoadmapGroup} from '../group/AbstractRoadmapGroup';
-
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export class RoadmapTask {
@@ -9,9 +7,17 @@ export class RoadmapTask {
   assigneeIds = [];
   color;
   order;
-  from;
-  to;
   involvement;
+
+  /**
+   * @private
+   */
+  _from;
+
+  /**
+   * @private
+   */
+  _to;
 
   /**
    * @param {number|string} id
