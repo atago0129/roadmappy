@@ -1,4 +1,3 @@
-import * as d3 from 'd3';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
@@ -14,44 +13,27 @@ export class Roadmap {
 
   /**
    * @param {string} type
-   * @param {Date} from
-   * @param {Date} to
+   * @param {Date} baseDate
+   * @param {array} span
    * @param {RoadmapTask[]} tasks
    * @param {RoadmapStory[]} stories
    * @param {RoadmapAssignee[]} assignees
    */
-  constructor(type, from, to, tasks, stories, assignees) {
+  constructor(type, baseDate, span, tasks, stories, assignees) {
     this._type = type || AbstractRoadmapGroup.TYPE.STORY;
-    this._from = from;
-    this._to = to;
     this._tasks = this._tasks.concat(tasks || []);
     this._stories = this._stories.concat(stories || []);
     this._assignees = this._assignees.concat(assignees || []);
-    this._redefineRange();
+    this._defineRange(baseDate, span);
   }
 
-  _redefineRange() {
-    if (this._from === null && this._to === null) {
-      const now = new Date().getTime();
-      let from = new Date(now - ONE_DAY * 30);
-      let to = new Date(now + ONE_DAY * 30);
-      const taskFrom = d3.min(this._tasks, (d) => d.from);
-      const taskTo = d3.max(this._tasks, (d) => d.to);
-      if (taskTo.getTime() < from.getTime() || to.getTime() < taskFrom.getTime()) {
-        from = taskFrom;
-        to = new Date(taskFrom.getTime() + ONE_DAY * 30 * 2);
-      }
-      this._from = from;
-      this._to = to;
-      return;
-    }
-    if (this._from !== null && this._to === null) {
-      this._to = new Date(this._from.getTime() + ONE_DAY * 30 * 2);
-      return;
-    }
-    if (this._from === null && this._to !== null) {
-      this._from = new Date(this._to - ONE_DAY * 30 * 2);
-    }
+  _defineRange(baseDate, span) {
+    const baseTime = baseDate.getTime();
+    const fromSpan = span[0];
+    const toSpan = span[Math.min(1, span.length - 1)];
+
+    this._from = new Date(baseTime - ONE_DAY * fromSpan);
+    this._to = new Date(baseTime + ONE_DAY * toSpan);
   }
 
   /**

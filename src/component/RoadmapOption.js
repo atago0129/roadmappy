@@ -3,6 +3,8 @@ import {RoadmapStyle} from './RoadmapStyle';
 
 export class RoadmapOption {
   type;
+  baseDate;
+  span;
   targetElementId;
   style;
 
@@ -11,8 +13,8 @@ export class RoadmapOption {
    */
   constructor(options) {
     this.type = AbstractRoadmapGroup.isValidType(options.type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
-    this.from = options.hasOwnProperty('from') ? new Date(options.from) : null;
-    this.to = options.hasOwnProperty('to') ? new Date(options.to) : null;
+    this.baseDate = new Date(options['baseDate'] || new Date());
+    this.span = [].concat(options['span'] || [30, 30]);
     this.targetElementId = '#' + options.target;
     this.style = new RoadmapStyle(options.hasOwnProperty('style') ? options.style : {});
   }
