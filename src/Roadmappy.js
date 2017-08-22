@@ -2,6 +2,7 @@ import {EventEmitter} from 'events';
 import {RoadmapFactory} from './component/RoadmapFactory';
 import {RoadmapCanvas} from './component/RoadmapCanvas';
 import {RoadmapOption} from './component/RoadmapOption';
+import {PluginInterface} from "./plugin/PluginInterface";
 
 export class Roadmappy extends EventEmitter {
 
@@ -29,7 +30,9 @@ export class Roadmappy extends EventEmitter {
     this.canvas.on('drag:start:task:to', this.emit.bind(this, 'drag:start:task:to'));
     this.canvas.on('drag:drag:task:to', this.emit.bind(this, 'drag:drag:task:to'));
     this.canvas.on('drag:end:task:to', this.emit.bind(this, 'drag:end:task:to'));
-    option.plugins.forEach((plugin) => plugin.initialize(this));
+    option.plugins.forEach((plugin) => {
+      if (plugin instanceof PluginInterface) plugin.initialize(this);
+    });
   }
 
   /**
