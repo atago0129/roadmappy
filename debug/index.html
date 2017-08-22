@@ -15,7 +15,11 @@
             "barHeight": 20,
             "timeFormat": "%-m月%-d日", // required d3 time format
             "tickInterval": "utcMonday" // required d3 interval format
-          }
+          },
+          plugins: [
+            new window.Roadmappy.DraggableTaskPlugin(),
+            new window.Roadmappy.ClickableTaskPlugin()
+          ]
         },
         {
           "tasks":[
@@ -36,35 +40,9 @@
           ]
         }
       );
-      roadmappy.render();
-      roadmappy.on('click:task', function(task) {
-        task.to = new Date(task.to.getTime() + 1000 * 60 * 60 * 24);
-        roadmappy.render();
-      });
-      roadmappy.on('drag:start:task:from', drag.bind(null, 'from', false));
-      roadmappy.on('drag:drag:task:from', drag.bind(null, 'from', false));
-      roadmappy.on('drag:end:task:from', drag.bind(null, 'from', true));
-      roadmappy.on('drag:start:task:to', drag.bind(null, 'to', false));
-      roadmappy.on('drag:drag:task:to', drag.bind(null, 'to', false));
-      roadmappy.on('drag:end:task:to', drag.bind(null, 'to', true));
-      function drag(key, reorder, task, pos) {
-        const xScale = roadmappy.canvas.xScale;
-        task[key] = xScale.invert(pos.x);
-        if (reorder) roadmappy.roadmap.reorder();
-        roadmappy.render();
-      }
 
-      roadmappy.on('drag:start:task', move.bind(null, false));
-      roadmappy.on('drag:drag:task', move.bind(null, false));
-      roadmappy.on('drag:end:task', move.bind(null, true));
-      function move(reorder, task, pos) {
-        const xScale = roadmappy.canvas.xScale;
-        const width = xScale(task.to) - xScale(task.from);
-        task.from = xScale.invert(pos.x - width / 2);
-        task.to = xScale.invert(pos.x + width / 2);
-        if (reorder) roadmappy.roadmap.reorder();
-        roadmappy.render();
-      }
+      roadmappy.render();
+
       window.roadmappy = roadmappy;
     </script>
   </body>

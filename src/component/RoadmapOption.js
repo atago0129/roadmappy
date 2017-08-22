@@ -7,6 +7,7 @@ export class RoadmapOption {
   span;
   targetElementId;
   style;
+  plugins;
 
   /**
    * @param {object} options
@@ -17,5 +18,6 @@ export class RoadmapOption {
     this.span = [].concat(options['span'] || [30, 30]);
     this.targetElementId = '#' + options.target;
     this.style = new RoadmapStyle(options.hasOwnProperty('style') ? options.style : {});
+    this.plugins = [].concat(options['plugins'] || []);
   }
 }
