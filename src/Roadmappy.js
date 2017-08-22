@@ -29,6 +29,7 @@ export class Roadmappy extends EventEmitter {
     this.canvas.on('drag:start:task:to', this.emit.bind(this, 'drag:start:task:to'));
     this.canvas.on('drag:drag:task:to', this.emit.bind(this, 'drag:drag:task:to'));
     this.canvas.on('drag:end:task:to', this.emit.bind(this, 'drag:end:task:to'));
+    option.plugins.forEach((plugin) => plugin.initialize(this));
   }
 
   /**
@@ -37,6 +38,5 @@ export class Roadmappy extends EventEmitter {
   render() {
     this.canvas.render();
   }
-
 
 }

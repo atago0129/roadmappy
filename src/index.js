@@ -1,4 +1,6 @@
 import {Roadmappy} from './Roadmappy';
+import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
+import {ClickableTaskPlugin} from "./plugin/ClickableTaskPlugin";
 
 if (document) {
   var scripts = document.getElementsByTagName('script');
@@ -10,3 +12,5 @@ if (document) {
 
 export default Roadmappy;
 
+export {DraggableTaskPlugin};
+export {ClickableTaskPlugin};
