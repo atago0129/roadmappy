@@ -40,5 +40,15 @@ export class AbstractRoadmapGroup {
     throw new Error('not implemented.');
   }
 
+  /**
+   * @returns {{id: number|string, name: string, order: name}}
+   */
+  toAssoc() {
+    return {
+      'id': this.id,
+      'name': this.name,
+      'order': this.order
+    }
+  }
 }
 

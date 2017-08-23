@@ -30,6 +30,8 @@ export class Roadmappy extends EventEmitter {
     this.canvas.on('drag:start:task:to', this.emit.bind(this, 'drag:start:task:to'));
     this.canvas.on('drag:drag:task:to', this.emit.bind(this, 'drag:drag:task:to'));
     this.canvas.on('drag:end:task:to', this.emit.bind(this, 'drag:end:task:to'));
+    this.canvas.on('click:task-label', this.emit.bind(this, 'click:task-label'));
+    this.canvas.on('contextmenu:canvas', this.emit.bind(this, 'contextmenu:canvas'));
     option.plugins.forEach((plugin) => {
       if (plugin instanceof PluginInterface) plugin.initialize(this);
     });

@@ -72,5 +72,21 @@ export class RoadmapTask {
     return new Date(date.getTime() - (date.getTime() % ONE_DAY));
   }
 
+  /**
+   * @returns {{id: number|string, name: string, from: string, to: string, color: string, story: number|string, assignee: number[]|string[], involvement: number}}
+   */
+  toAssoc() {
+    return {
+      'id': this.id,
+      'name': this.name,
+      'from': this._from.toISOString(),
+      'to': this._to.toISOString(),
+      'color': this.color,
+      'story': this.storyId,
+      'assignee': this.assigneeIds,
+      'involvement': this.involvement
+    };
+  }
+
 }
 

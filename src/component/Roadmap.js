@@ -146,4 +146,12 @@ export class Roadmap {
     this._to = to;
   }
 
+  toAssoc() {
+    return {
+      'tasks': this._tasks.reduce((tasks, task) => {return tasks.concat(task.toAssoc());}, []),
+      'stories': this._stories.reduce((stories, story) => {return stories.concat(story.toAssoc())}, []),
+      'assignees': this._assignees.reduce((assginees, assignee) => {return assginees.concat(assignee.toAssoc())}, [])
+    };
+  }
+
 }
