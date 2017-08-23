@@ -1,9 +1,6 @@
 import {PluginInterface} from "./PluginInterface";
 
 export class DraggableTaskPlugin extends PluginInterface {
-
-  roadmappy;
-
   /**
    * @param {Roadmappy} roadmappy
    */

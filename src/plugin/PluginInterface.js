@@ -1,5 +1,10 @@
 export class PluginInterface {
   /**
+   * {Roadmappy}
+   */
+  roadmappy;
+
+  /**
    * @param {Roadmappy} roadmappy
    */
   initialize(roadmappy) {

@@ -1,6 +1,5 @@
 import * as d3 from 'd3';
 import {EventEmitter} from 'events';
-import ContextMenu from 'd3-v4-contextmenu';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
 export class RoadmapCanvas extends EventEmitter {
@@ -28,6 +27,7 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _init() {
     this.svg = this.element.append('svg').attr('style', 'overflow: visible');
+    this.svg.on('contextmenu', () => this.emit('contextmenu:canvas', d3.mouse(this.svg.node())));
     this.xScale = d3.scaleTime().domain([]);
     this.yScale = d3.scaleBand().domain([]);
     this.xAxis = this._createXAxis();
@@ -226,6 +226,14 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('ry', 2)
       .attr('stroke', 'none')
       .attr('fill-opacity', 0.5)
+      .call(
+        d3.drag()
+          .container(this.barArea.node())
+          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
+          .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+      )
       .on('click', (d) =>  this.emit('click:task', d));
     enter.append('text')
       .attr('class', 'bar-label')
@@ -236,14 +244,7 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('font-size', this.yScale.bandwidth() / 2)
       .attr('fill', '#000')
       .attr('cursor', 'move')
-      .call(
-        d3.drag()
-          .container(this.barArea.node())
-          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
-          .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-      );
+      .on('click', (d) => this.emit('click:task-label', d, d3.event.target));
     enter.append('text')
       .attr('class', 'bar-to-handle')
       .text('»')
