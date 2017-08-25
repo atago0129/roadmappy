@@ -37,22 +37,32 @@ export class Roadmap {
   }
 
   /**
-   * @param {number} storyId
+   * @param {number} id
    * @returns {RoadmapStory|null}
    */
-  getStoryById(storyId) {
+  getStoryById(id) {
     return this._stories.filter(function(story) {
-      return story.id === storyId;
+      return story.id === id;
     }).pop() || null;
   }
 
   /**
-   * @param {number} assigneeId
+   * @param {number} id
    * @returns {RoadmapAssignee|null}
    */
-  getAssigneeById(assigneeId) {
+  getAssigneeById(id) {
     return this._assignees.filter(function(asignee) {
-      return asignee.id === assigneeId;
+      return asignee.id === id;
+    }).pop() || null;
+  }
+
+  /**
+   * @param {string} id
+   * @return 
+   */
+  getTaskById(id) {
+    return this._tasks.filter(function(task) {
+      return task.id === id;
     }).pop() || null;
   }
 

@@ -73,6 +73,22 @@ export class RoadmapTask {
   }
 
   /**
+   * @param {object} assoc
+   */
+  merge(assoc) {
+    for (const name in assoc) {
+      switch (name) {
+        case 'assigneeIds':
+          this[name] = [].concat(assoc[name] || []).map((id) => parseInt(id, 10));
+          break;
+        default:
+          this[name] = assoc[name];
+          break;
+      }
+    }
+  }
+
+  /**
    * @returns {{id: number|string, name: string, from: string, to: string, color: string, story: number|string, assignee: number[]|string[], involvement: number}}
    */
   toAssoc() {
@@ -83,7 +99,7 @@ export class RoadmapTask {
       'to': this._to.toISOString(),
       'color': this.color,
       'story': this.storyId,
-      'assignee': this.assigneeIds,
+      'assigneeIds': this.assigneeIds,
       'involvement': this.involvement
     };
   }
