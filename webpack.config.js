@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === 'production' && false;
 
 module.exports = {
 
@@ -32,22 +32,27 @@ module.exports = {
   module: {
     rules: [{
       test: /.js$/,
-      loader: 'babel-loader',
-      options: {
-        cacheDirectory: true,
-        presets: [
-          ['env', {
-            modules: false,
-            loose: true,
-            targets: {
-              browsers: 'last 2 versions'
-            }
-          }]
-        ],
-        plugins: [
-          'babel-plugin-transform-class-properties'
-        ]
-      }
+      use: [{
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+          presets: [
+            ['env', {
+              modules: false,
+              loose: true,
+              targets: {
+                browsers: 'last 2 versions'
+              }
+            }]
+          ],
+          plugins: [
+            'babel-plugin-transform-class-properties'
+          ]
+        }
+      }],
+    }, {
+      test: /.css$/,
+      use: ['style-loader', 'css-loader']
     }]
   },
 

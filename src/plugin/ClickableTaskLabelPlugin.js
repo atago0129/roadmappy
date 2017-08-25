@@ -2,6 +2,7 @@ import {PluginInterface} from "./PluginInterface";
 import * as d3 from 'd3';
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
+import './ClickableTaskLabelPlugin.css';
 
 export class ClickableTaskLabelPlugin extends PluginInterface {
 
@@ -14,6 +15,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
   initialize(roadmappy) {
     this.roadmappy = roadmappy;
     this.form = document.createElement('form');
+    this.form.setAttribute('class', 'ClickableTaskLabelPlugin-form');
     this.form.addEventListener('submit', this._onSubmit);
     this.form.addEventListener('click', this._onClick);
     roadmappy.on('click:task-label', this._onTaskLabelClick);
@@ -24,13 +26,13 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       <input type="hidden" name="id" value="<%= task.id %>">
       <div>
         <label>
-          <span class="form-label">name</span>
+          <span>name</span>
           <input type="text" name="name" value=<%= task.name  %>>
         </label>
       </div>
       <div>
         <label>
-          <span class="form-label">story</span>
+          <span>story</span>
           <select name="storyId">
             <% for (const s of stories) { %>
             <option value="<%= s.id %>"<%= task.storyId === s.id ? " selected": "" %>><%= s.name %></option>
@@ -40,7 +42,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       </div>
       <div>
         <label>
-          <span class="form-label">assignee</span>
+          <span>assignee</span>
           <select name="assigneeIds" multiple="true">
             <% for (const a of assignees) { %>
             <option value="<%= a.id %>"<%= task.assigneeIds.indexOf(a.id) >= 0 ? " selected": "" %>><%= a.name %></option>
