@@ -57,13 +57,22 @@ export class Roadmap {
   }
 
   /**
-   * @param {string} id
-   * @return 
+   * @param {number} id
+   * @return {RoadmapTask}
    */
   getTaskById(id) {
     return this._tasks.filter(function(task) {
       return task.id === id;
     }).pop() || null;
+  }
+
+  /**
+   * @param {number} id
+   */
+  removeTaskById(id) {
+    this._tasks = this._tasks.filter(function(task) {
+      return task.id !== id;
+    });
   }
 
   /**

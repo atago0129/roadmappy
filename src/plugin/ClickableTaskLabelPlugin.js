@@ -69,14 +69,27 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
   _onClick = e => {
     const name = e.target.getAttribute('data-button-type');
     switch (name) {
-      case 'save':
+      case 'save': {
         const assoc = getFormData(this.form);
         assoc.id = parseInt(assoc.id, 10);
         const task = this.roadmappy.roadmap.getTaskById(assoc.id);
         task.merge(assoc);
         this.roadmappy.render();
-      case 'delete':
-      case 'cancel':
+        this.form.parentElement.removeChild(this.form);
+        break;
+      }
+      case 'delete': {
+        const assoc = getFormData(this.form);
+        assoc.id = parseInt(assoc.id, 10);
+        this.roadmappy.roadmap.removeTaskById(assoc.id);
+        this.roadmappy.render();
+        this.form.parentElement.removeChild(this.form);
+        break;
+      }
+      case 'cancel': {
+        this.form.parentElement.removeChild(this.form);
+        break;
+      }
     }
   };
 
