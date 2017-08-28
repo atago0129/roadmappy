@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 
-const isProduction = process.env.NODE_ENV === 'production' && false;
+const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
 
