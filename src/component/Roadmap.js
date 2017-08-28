@@ -1,4 +1,5 @@
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
+import {RoadmapTask} from "./task/RoadmapTask";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -106,6 +107,27 @@ export class Roadmap {
       default:
         throw new Error('not detected group type.');
     }
+  }
+
+  /**
+   * @param {RoadmapTask} indexTask
+   * @param {AbstractRoadmapGroup} group
+   * @param {string} from
+   */
+  addEmptyTask(indexTask, group, from) {
+    const taskId = Math.max.apply(null, this._tasks.reduce((taskIds, task) => taskIds.concat(task.id), [])) + 1;
+    let newTask;
+    switch (group.type) {
+      case AbstractRoadmapGroup.TYPE.STORY:
+        newTask = new RoadmapTask(taskId, 'new task', group.id, null, null, 0, from, new Date(from.getTime() + 7 * ONE_DAY), 100);
+        break;
+      case AbstractRoadmapGroup.TYPE.ASSIGNEE:
+        newTask = new RoadmapTask(taskId, 'new task', null, group.id, null, 0, from, new Date(from.getTime() + 7 * ONE_DAY), 100);
+        break;
+      default:
+        throw new Error('invalid argument.');
+    }
+    this._tasks.splice(this._tasks.indexOf(indexTask), 0, newTask);
   }
 
   /**

@@ -51,6 +51,12 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         </label>
       </div>
       <div>
+        <label>
+          <span>color</span>
+          <input type="color" name="color" value=<%= task.color  %>>
+        </label>
+      </div>
+      <div>
         <input type="submit" value="Save" data-button-type="save">
         /
         <input type="submit" value="Delete" data-button-type="delete">
@@ -109,11 +115,11 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       this._onTaskLabelDoubleClick(task, labelNode);
 
     }
-  }
+  };
 
   _onTaskLabelDoubleClick = (task, labelNode) => {
     this._initializeForm(task);
     this.roadmappy.canvas.element.node().parentElement.appendChild(this.form);
-  }
+  };
 
 }
