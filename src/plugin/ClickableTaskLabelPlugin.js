@@ -21,6 +21,9 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     roadmappy.on('click:task-label', this._onTaskLabelClick);
   }
 
+  /**
+   * @param {RoadmapTask} task
+   */
   _initializeForm(task) {
     this.form.innerHTML = template(`
       <input type="hidden" name="id" value="<%= task.id %>">
@@ -70,10 +73,16 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     });
   }
 
+  /**
+   * @param {Event} e
+   */
   _onSubmit = e => {
     e.preventDefault();
   };
 
+  /**
+   * @param {Event} e
+   */
   _onClick = e => {
     const name = e.target.getAttribute('data-button-type');
     switch (name) {
@@ -101,6 +110,10 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     }
   };
 
+  /**
+   * @param {RoadmapTask} task
+   * @param {Selection} labelNode
+   */
   _onTaskLabelClick = (task, labelNode) => {
     if (this.clickCount === 0) {
       ++this.clickCount;
@@ -117,6 +130,10 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     }
   };
 
+  /**
+   * @param {RoadmapTask} task
+   * @param {Selection} labelNode
+   */
   _onTaskLabelDoubleClick = (task, labelNode) => {
     this._initializeForm(task);
     this.roadmappy.canvas.element.node().parentElement.appendChild(this.form);
