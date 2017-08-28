@@ -65,8 +65,8 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       </div>
     `)({
       task: task.toAssoc(),
-      stories: this.roadmappy.roadmap._stories.map(s => s.toAssoc()),
-      assignees: this.roadmappy.roadmap._assignees.map(a => a.toAssoc()),
+      stories: this.roadmappy.roadmap.getStories().map(s => s.toAssoc()),
+      assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
   }
 

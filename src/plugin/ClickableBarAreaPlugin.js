@@ -10,7 +10,7 @@ export class ClickableBarAreaPlugin extends PluginInterface {
     roadmappy.on('click:bar-area', this._onClick);
   }
 
-  _onClick = (indexTask, group, from) => {
+  _onClick = (xIndex, yIndex) => {
     if (this.clickCount === 0) {
       ++this.clickCount;
 
@@ -21,12 +21,16 @@ export class ClickableBarAreaPlugin extends PluginInterface {
     } else {
       this.clickCount = 0;
       d3.event.preventDefault();
-      this._onDoubleClick(indexTask, group, from);
+      this._onDoubleClick(xIndex, yIndex);
     }
   };
 
-  _onDoubleClick = (indexTask, group, from) => {
-    this.roadmappy.roadmap.addEmptyTask(indexTask, group, from);
+  _onDoubleClick = (xIndex, yIndex) => {
+    this.roadmappy.roadmap.addEmptyTask(
+      this.roadmappy.roadmap.getRawTask().indexOf(this.roadmappy.roadmap.getTasks()[yIndex]),
+      this.roadmappy.canvas.yAxisMap[yIndex],
+      xIndex
+    );
     this.roadmappy.render();
   }
 }

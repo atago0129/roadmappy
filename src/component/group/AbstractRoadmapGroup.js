@@ -20,13 +20,13 @@ export class AbstractRoadmapGroup {
 
   /**
    * @param {string} type
-   * @param {number|string} id
+   * @param {number} id
    * @param {string} name
    * @param {number} order
    */
   constructor(type, id, name, order) {
     this.type = type;
-    this.id = id;
+    this.id = parseInt(id, 10);
     this.name = name;
     this.order = order;
   }
@@ -41,7 +41,7 @@ export class AbstractRoadmapGroup {
   }
 
   /**
-   * @returns {{id: number|string, name: string, order: name}}
+   * @returns {{id: number, name: string, order: name}}
    */
   toAssoc() {
     return {
