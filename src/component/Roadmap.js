@@ -77,6 +77,13 @@ export class Roadmap {
   }
 
   /**
+   * @returns {RoadmapTask[]}
+   */
+  getRawTask() {
+    return this._tasks;
+  }
+
+  /**
    * @return {RoadmapTask[]}
    */
   getTasks() {
@@ -101,20 +108,34 @@ export class Roadmap {
   getGroups() {
     switch (this._type) {
       case AbstractRoadmapGroup.TYPE.STORY:
-        return [].concat(this._stories);
+        return this.getStories();
       case AbstractRoadmapGroup.TYPE.ASSIGNEE:
-        return [].concat(this._assignees);
+        return this.getAssignees();
       default:
         throw new Error('not detected group type.');
     }
   }
 
   /**
-   * @param {RoadmapTask} indexTask
+   * @returns {RoadmapStory[]}
+   */
+  getStories() {
+    return [].concat(this._stories);
+  }
+
+  /**
+   * @returns {RoadmapAssignee[]}
+   */
+  getAssignees() {
+    return [].concat(this._assignees);
+  }
+
+  /**
+   * @param {number} index
    * @param {AbstractRoadmapGroup} group
    * @param {string} from
    */
-  addEmptyTask(indexTask, group, from) {
+  addEmptyTask(index, group, from) {
     const taskId = Math.max.apply(null, this._tasks.reduce((taskIds, task) => taskIds.concat(task.id), [])) + 1;
     let newTask;
     switch (group.type) {
@@ -127,7 +148,7 @@ export class Roadmap {
       default:
         throw new Error('invalid argument.');
     }
-    this._tasks.splice(this._tasks.indexOf(indexTask), 0, newTask);
+    this._tasks.splice(index, 0, newTask);
   }
 
   /**

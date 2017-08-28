@@ -20,7 +20,7 @@ export class RoadmapTask {
   _to;
 
   /**
-   * @param {number|string} id
+   * @param {number} id
    * @param {string} name
    * @param {number|string|null} storyId
    * @param {number|string|null} assigneeIds
@@ -31,13 +31,13 @@ export class RoadmapTask {
    * @param {number} involvement
    */
   constructor(id, name, storyId, assigneeIds, color, order, from, to, involvement) {
-    this.id = id;
+    this.id = parseInt(id, 10);
     this.name = name;
     this.storyId = storyId;
     this.assigneeIds = [].concat(assigneeIds || []);
     this.color = color || '#4286f4';
     this.order = parseInt(order);
-    this.involvement = Math.min(parseInt(involvement), 100);
+    this.involvement = Math.min(parseInt(involvement, 10), 100);
     this._from = new Date(from);
     this._to = new Date(new Date(to).setHours((new Date(to).getHours() + 24)));
     this.from = this._from;
@@ -89,7 +89,7 @@ export class RoadmapTask {
   }
 
   /**
-   * @returns {{id: number|string, name: string, from: string, to: string, color: string, story: number|string, assignee: number[]|string[], involvement: number}}
+   * @returns {{id: number, name: string, from: string, to: string, color: string, story: number|string, assignee: number[]|string[], involvement: number}}
    */
   toAssoc() {
     return {

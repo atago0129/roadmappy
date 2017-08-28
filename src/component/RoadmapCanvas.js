@@ -8,7 +8,7 @@ export class RoadmapCanvas extends EventEmitter {
   element;
   style;
 
-  _yAxisMap;
+  yAxisMap;
 
   /**
    * @param {Roadmap} roadmap
@@ -62,13 +62,10 @@ export class RoadmapCanvas extends EventEmitter {
     this._updateXAxis(w, h);
     this._updateYAxis();
     this._updateTaskBars(tasks);
-
-    // utility.
-    // this._addMouseHelper(marginLeft);
   }
 
   _initializeYAxisMap() {
-    this._yAxisMap = this.roadmap.getGroups().reduce((map, group) => {
+    this.yAxisMap = this.roadmap.getGroups().reduce((map, group) => {
       return map.concat(this.roadmap.getTasksByGroup(group).map(() => {
         return group;
       }));
@@ -112,11 +109,7 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('width', '100%')
       .attr('height', '100%')
       .on('click', () => {
-        const index = this._invertYScale(d3.mouse(this.svg.node())[1]);
-        const group = this._yAxisMap[index];
-        const indexTask = this.roadmap.getTasks()[index];
-        const from = this.xScale.invert(d3.mouse(this.svg.node())[0]);
-        this.emit('click:bar-area', indexTask, group, from);
+        this.emit('click:bar-area', this.xScale.invert(d3.mouse(this.svg.node())[0]), this._invertYScale(d3.mouse(this.svg.node())[1]));
       });
     barArea.call(
       d3.drag()
@@ -204,10 +197,10 @@ export class RoadmapCanvas extends EventEmitter {
       d3.axisLeft(this.yScale)
       .tickSize(0)
       .tickFormat((d) => {
-        if (this._yAxisMap[d - 1] === this._yAxisMap[d]) {
+        if (this.yAxisMap[d - 1] === this.yAxisMap[d]) {
           return '';
         } else {
-          return this._yAxisMap[d].name;
+          return this.yAxisMap[d].name;
         }
       })
     );
