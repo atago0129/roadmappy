@@ -136,7 +136,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
    */
   _onTaskLabelDoubleClick = (task, labelNode) => {
     this._initializeForm(task);
-    this.roadmappy.canvas.element.node().parentElement.appendChild(this.form);
+    this.roadmappy.canvas.element.node().appendChild(this.form);
   };
 
 }
