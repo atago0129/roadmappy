@@ -27,7 +27,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       <div>
         <label>
           <span>name</span>
-          <input type="text" name="name" value=<%= task.name  %>>
+          <input type="text" name="name" value="<%= task.name  %>">
         </label>
       </div>
       <div>
@@ -53,7 +53,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       <div>
         <label>
           <span>color</span>
-          <input type="color" name="color" value=<%= task.color  %>>
+          <input type="color" name="color" value="<%= task.color  %>">
         </label>
       </div>
       <div>
