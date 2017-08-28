@@ -98,7 +98,7 @@ export class RoadmapTask {
       'from': this._from.toISOString(),
       'to': this._to.toISOString(),
       'color': this.color,
-      'story': this.storyId,
+      'storyId': this.storyId,
       'assigneeIds': this.assigneeIds,
       'involvement': this.involvement
     };
