@@ -1,8 +1,9 @@
 import {Roadmappy} from './Roadmappy';
-import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
+import {CanvasContextMenu} from "./plugin/CanvasContextMenu";
 import {ClickableTaskPlugin} from "./plugin/ClickableTaskPlugin";
 import {ClickableTaskLabelPlugin} from "./plugin/ClickableTaskLabelPlugin";
-import {CanvasContextMenu} from "./plugin/CanvasContextMenu";
+import {ClickableBarAreaPlugin} from "./plugin/ClickableBarAreaPlugin";
+import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
 
 if (document) {
   var scripts = document.getElementsByTagName('script');
@@ -14,7 +15,8 @@ if (document) {
 
 export default Roadmappy;
 
-export {DraggableTaskPlugin};
+export {CanvasContextMenu};
 export {ClickableTaskPlugin};
 export {ClickableTaskLabelPlugin};
-export {CanvasContextMenu};
+export {ClickableBarAreaPlugin};
+export {DraggableTaskPlugin};

@@ -8,6 +8,8 @@ export class RoadmapCanvas extends EventEmitter {
   element;
   style;
 
+  _yAxisMap;
+
   /**
    * @param {Roadmap} roadmap
    * @param {RoadmapOption} option
@@ -36,10 +38,9 @@ export class RoadmapCanvas extends EventEmitter {
     this.roadmap.reorder();
   }
 
-  /**
-   * @param {Roadmap} roadmap
-   */
   render() {
+    this._initializeYAxisMap();
+
     const groups = this.roadmap.getGroups();
     const tasks = this.roadmap.getTasks();
 
@@ -56,7 +57,7 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('style', `padding: 0 0 ${marginBottom}px ${marginLeft}px`);
 
     // create chart.
-    this._updateXScale(tasks, w);
+    this._updateXScale(w);
     this._updateYScale(tasks, h);
     this._updateXAxis(w, h);
     this._updateYAxis();
@@ -64,6 +65,14 @@ export class RoadmapCanvas extends EventEmitter {
 
     // utility.
     // this._addMouseHelper(marginLeft);
+  }
+
+  _initializeYAxisMap() {
+    this._yAxisMap = this.roadmap.getGroups().reduce((map, group) => {
+      return map.concat(this.roadmap.getTasksByGroup(group).map(() => {
+        return group;
+      }));
+    }, []);
   }
 
   /**
@@ -102,6 +111,13 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('y', 0)
       .attr('width', '100%')
       .attr('height', '100%')
+      .on('click', () => {
+        const index = this._invertYScale(d3.mouse(this.svg.node())[1]);
+        const group = this._yAxisMap[index];
+        const indexTask = this.roadmap.getTasks()[index];
+        const from = this.xScale.invert(d3.mouse(this.svg.node())[0]);
+        this.emit('click:bar-area', indexTask, group, from);
+      });
     barArea.call(
       d3.drag()
         .container(barArea.node())
@@ -124,11 +140,10 @@ export class RoadmapCanvas extends EventEmitter {
   }
 
   /**
-   * @param {RoadmapTask[]} tasks
    * @param {number} w
    * @private
    */
-  _updateXScale(tasks, w) {
+  _updateXScale(w) {
     this.xScale
       .domain([this.roadmap.from, this.roadmap.to])
       .rangeRound([0, w]);
@@ -162,7 +177,7 @@ export class RoadmapCanvas extends EventEmitter {
     this.xAxis
       .selectAll('.tick line')
       .attr('stroke', '#dddddd')
-      .attr('shape-rendering', 'crispEdges')
+      .attr('shape-rendering', 'crispEdges');
 
     this.xAxis.select('.now').remove();
     const now = this.xScale(new Date());
@@ -189,17 +204,11 @@ export class RoadmapCanvas extends EventEmitter {
       d3.axisLeft(this.yScale)
       .tickSize(0)
       .tickFormat((d) => {
-        const yAxisMap = this.roadmap.getGroups().reduce((labels, group) => {
-          let isFirstTaskPerGroup = true;
-          return labels.concat(this.roadmap.getTasksByGroup(group).map((task) => {
-            if (isFirstTaskPerGroup) {
-              isFirstTaskPerGroup = false;
-              return group.name;
-            }
-            return '';
-          }));
-        }, []);
-        return yAxisMap[d];
+        if (this._yAxisMap[d - 1] === this._yAxisMap[d]) {
+          return '';
+        } else {
+          return this._yAxisMap[d].name;
+        }
       })
     );
   }
@@ -209,8 +218,6 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _updateTaskBars(tasks) {
-    const _this = this;
-
     const bars = this.barArea.selectAll('.bar').data(tasks);
 
     // ENTER.
@@ -229,12 +236,12 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
+          .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       )
-      .on('click', (d) =>  this.emit('click:task', d));
+      .on('click', (d) => this.emit('click:task', d));
     enter.append('text')
       .attr('class', 'bar-label')
       .attr('x', '50%')
@@ -258,7 +265,7 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
+          .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('drag', (d) => this.emit('drag:drag:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('end', (d) => this.emit('drag:end:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
@@ -276,7 +283,7 @@ export class RoadmapCanvas extends EventEmitter {
       .call(
         d3.drag()
           .container(this.barArea.node())
-          .subject(() => d3.event.subject ? d3.event.subject : this._invertYScale(d3.event.y))
+          .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('drag', (d) => this.emit('drag:drag:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
           .on('end', (d) => this.emit('drag:end:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
@@ -309,7 +316,7 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _getYAxisWidth(groups) {
     const fakeYAxis = this.svg.append('g')
-      .attr('class', 'fake-y-axis-group')
+      .attr('class', 'fake-y-axis-group');
 
     fakeYAxis
       .selectAll('text')
@@ -335,7 +342,7 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _getXAxisHeight(tasks) {
     const fakeXAxis = this.svg.append('g')
-      .attr('class', 'fake-x-axis-group')
+      .attr('class', 'fake-x-axis-group');
 
     fakeXAxis
       .selectAll('text')
@@ -360,7 +367,7 @@ export class RoadmapCanvas extends EventEmitter {
    */
   _invertYScale(y) {
     const step = this.yScale.step();
-    return this.roadmap.getTasks()[this.yScale.domain()[Math.floor(y / step)]];
+    return this.yScale.domain()[Math.floor(y / step)];
   }
 
 }

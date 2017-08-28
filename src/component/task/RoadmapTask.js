@@ -22,12 +22,12 @@ export class RoadmapTask {
   /**
    * @param {number|string} id
    * @param {string} name
-   * @param {number|string} storyId
-   * @param {number|string} assigneeIds
+   * @param {number|string|null} storyId
+   * @param {number|string|null} assigneeIds
    * @param {string|null} color
    * @param {number} order
-   * @param {string} from
-   * @param {string} to
+   * @param {string|number|Date} from
+   * @param {string|number|Date} to
    * @param {number} involvement
    */
   constructor(id, name, storyId, assigneeIds, color, order, from, to, involvement) {
@@ -35,7 +35,7 @@ export class RoadmapTask {
     this.name = name;
     this.storyId = storyId;
     this.assigneeIds = [].concat(assigneeIds || []);
-    this.color = color;
+    this.color = color || '#4286f4';
     this.order = parseInt(order);
     this.involvement = Math.min(parseInt(involvement), 100);
     this._from = new Date(from);
