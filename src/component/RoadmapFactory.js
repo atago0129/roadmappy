@@ -67,8 +67,8 @@ export class RoadmapFactory {
       return new RoadmapTask(
         task.id,
         task.name,
-        task.story || null,
-        task.assignee || null,
+        task.storyId || null,
+        task.assigneeIds || [],
         task.color || null,
         task.order || 0,
         task.from,

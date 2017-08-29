@@ -25,16 +25,23 @@ export class Roadmap {
     this._tasks = this._tasks.concat(tasks || []);
     this._stories = this._stories.concat(stories || []);
     this._assignees = this._assignees.concat(assignees || []);
-    this._defineRange(baseDate, span);
+    this._initialize(baseDate, span);
   }
 
-  _defineRange(baseDate, span) {
-    const baseTime = baseDate.getTime();
-    const fromSpan = span[0];
-    const toSpan = span[Math.min(1, span.length - 1)];
+  /**
+   * @param 
+   */
+  _initialize(baseDate, span) {
+    // initialize from/to.
+    this._from = new Date(baseDate.getTime() - ONE_DAY * span[0]);
+    this._to = new Date(baseDate.getTime() + ONE_DAY * span[1]);
 
-    this._from = new Date(baseTime - ONE_DAY * fromSpan);
-    this._to = new Date(baseTime + ONE_DAY * toSpan);
+    // initialize empty group.
+    this.getGroups().forEach(group => {
+      if (this.getTasksByGroup(group).length === 0) {
+        this.addEmptyTask(group, this._from);
+      }
+    });
   }
 
   /**
@@ -131,12 +138,11 @@ export class Roadmap {
   }
 
   /**
-   * @param {number} index
    * @param {AbstractRoadmapGroup} group
    * @param {string} from
    */
-  addEmptyTask(index, group, from) {
-    const taskId = Math.max.apply(null, this._tasks.reduce((taskIds, task) => taskIds.concat(task.id), [])) + 1;
+  addEmptyTask(group, from) {
+    const taskId = Math.max.apply(null, [0].concat(this._tasks.map(t => t.id))) + 1;
     let newTask;
     switch (group.type) {
       case AbstractRoadmapGroup.TYPE.STORY:
@@ -148,7 +154,7 @@ export class Roadmap {
       default:
         throw new Error('invalid argument.');
     }
-    this._tasks.splice(index, 0, newTask);
+    this._tasks.push(newTask);
   }
 
   /**

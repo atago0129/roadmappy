@@ -87,6 +87,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     const name = e.target.getAttribute('data-button-type');
     switch (name) {
       case 'save': {
+        console.log(this.roadmappy.roadmap);
         const assoc = getFormData(this.form);
         assoc.id = parseInt(assoc.id, 10);
         const task = this.roadmappy.roadmap.getTaskById(assoc.id);

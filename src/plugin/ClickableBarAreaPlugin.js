@@ -26,11 +26,7 @@ export class ClickableBarAreaPlugin extends PluginInterface {
   };
 
   _onDoubleClick = (xIndex, yIndex) => {
-    this.roadmappy.roadmap.addEmptyTask(
-      this.roadmappy.roadmap.getRawTask().indexOf(this.roadmappy.roadmap.getTasks()[yIndex]),
-      this.roadmappy.canvas.yAxisMap[yIndex],
-      xIndex
-    );
+    this.roadmappy.roadmap.addEmptyTask(this.roadmappy.canvas.yAxisMap[yIndex], xIndex);
     this.roadmappy.render();
   }
 }
