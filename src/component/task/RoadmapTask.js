@@ -93,14 +93,14 @@ export class RoadmapTask {
    */
   toAssoc() {
     return {
-      'id': this.id,
-      'name': this.name,
-      'from': this._from.toISOString(),
-      'to': this._to.toISOString(),
-      'color': this.color,
-      'storyId': this.storyId,
-      'assigneeIds': this.assigneeIds,
-      'involvement': this.involvement
+      id: this.id,
+      name: this.name,
+      from: this._from.toISOString(),
+      to: this._to.toISOString(),
+      color: this.color,
+      storyId: this.storyId,
+      assigneeIds: this.assigneeIds,
+      involvement: this.involvement
     };
   }
 

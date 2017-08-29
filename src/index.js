@@ -1,5 +1,5 @@
 import {Roadmappy} from './Roadmappy';
-import {CanvasContextMenu} from "./plugin/CanvasContextMenu";
+import {CanvasContextMenuPlugin} from "./plugin/CanvasContextMenuPlugin";
 import {ClickableTaskPlugin} from "./plugin/ClickableTaskPlugin";
 import {ClickableTaskLabelPlugin} from "./plugin/ClickableTaskLabelPlugin";
 import {ClickableBarAreaPlugin} from "./plugin/ClickableBarAreaPlugin";
@@ -15,7 +15,7 @@ if (document) {
 
 export default Roadmappy;
 
-export {CanvasContextMenu};
+export {CanvasContextMenuPlugin};
 export {ClickableTaskPlugin};
 export {ClickableTaskLabelPlugin};
 export {ClickableBarAreaPlugin};

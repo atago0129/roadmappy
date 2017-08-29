@@ -18,8 +18,17 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     this.form.setAttribute('class', 'ClickableTaskLabelPlugin-form');
     this.form.addEventListener('submit', this._onSubmit);
     this.form.addEventListener('click', this._onClick);
-    roadmappy.on('click:task-label', this._onTaskLabelClick);
+    roadmappy.on('click:task-label', this.toOnDoubleClick(this._onTaskLabelDoubleClick));
   }
+
+  /**
+   * @param {RoadmapTask} task
+   * @param {Selection} labelNode
+   */
+  _onTaskLabelDoubleClick = (task, labelNode) => {
+    this._initializeForm(task);
+    this.roadmappy.canvas.element.node().appendChild(this.form);
+  };
 
   /**
    * @param {RoadmapTask} task
@@ -87,7 +96,6 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     const name = e.target.getAttribute('data-button-type');
     switch (name) {
       case 'save': {
-        console.log(this.roadmappy.roadmap);
         const assoc = getFormData(this.form);
         assoc.id = parseInt(assoc.id, 10);
         const task = this.roadmappy.roadmap.getTaskById(assoc.id);
@@ -109,35 +117,6 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         break;
       }
     }
-  };
-
-  /**
-   * @param {RoadmapTask} task
-   * @param {Selection} labelNode
-   */
-  _onTaskLabelClick = (task, labelNode) => {
-    if (this.clickCount === 0) {
-      ++this.clickCount;
-
-      if (this.doubleClickTimerId) {
-        clearTimeout(this.doubleClickTimerId);
-      }
-      this.doubleClickTimerId = setTimeout(() => this.clickCount = 0, 350);
-    } else {
-      this.clickCount = 0;
-      d3.event.preventDefault();
-      this._onTaskLabelDoubleClick(task, labelNode);
-
-    }
-  };
-
-  /**
-   * @param {RoadmapTask} task
-   * @param {Selection} labelNode
-   */
-  _onTaskLabelDoubleClick = (task, labelNode) => {
-    this._initializeForm(task);
-    this.roadmappy.canvas.element.node().appendChild(this.form);
   };
 
 }

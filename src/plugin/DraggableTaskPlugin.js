@@ -7,14 +7,11 @@ export class DraggableTaskPlugin extends PluginInterface {
   initialize(roadmappy) {
     this.roadmappy = roadmappy;
 
-    roadmappy.on('drag:start:task:from', this._drag.bind(this, 'from', false));
     roadmappy.on('drag:drag:task:from', this._drag.bind(this, 'from', false));
     roadmappy.on('drag:end:task:from', this._drag.bind(this, 'from', true));
-    roadmappy.on('drag:start:task:to', this._drag.bind(this, 'to', false));
     roadmappy.on('drag:drag:task:to', this._drag.bind(this, 'to', false));
     roadmappy.on('drag:end:task:to', this._drag.bind(this, 'to', true));
 
-    roadmappy.on('drag:start:task', this._move.bind(this, false));
     roadmappy.on('drag:drag:task', this._move.bind(this, false));
     roadmappy.on('drag:end:task', this._move.bind(this, true));
   }
