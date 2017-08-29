@@ -29,7 +29,8 @@ export class Roadmap {
   }
 
   /**
-   * @param 
+   * @param {Date} baseDate
+   * @param {Array} span
    */
   _initialize(baseDate, span) {
     // initialize from/to.
@@ -39,7 +40,7 @@ export class Roadmap {
     // initialize empty group.
     this.getGroups().forEach(group => {
       if (this.getTasksByGroup(group).length === 0) {
-        this.addEmptyTask(group, this._from);
+        this.addEmptyTask(0, group, this._from);
       }
     });
   }
@@ -138,10 +139,11 @@ export class Roadmap {
   }
 
   /**
+   * @param {number} index
    * @param {AbstractRoadmapGroup} group
    * @param {string} from
    */
-  addEmptyTask(group, from) {
+  addEmptyTask(index, group, from) {
     const taskId = Math.max.apply(null, [0].concat(this._tasks.map(t => t.id))) + 1;
     let newTask;
     switch (group.type) {
@@ -154,7 +156,7 @@ export class Roadmap {
       default:
         throw new Error('invalid argument.');
     }
-    this._tasks.push(newTask);
+    this._tasks.splice(index, 0, newTask);
   }
 
   /**
@@ -192,14 +194,23 @@ export class Roadmap {
     return 'call toString';
   }
 
+  /**
+   * @return {Date}
+   */
   get from() {
     return this._from;
   }
 
+  /**
+   * @return {Date}
+   */
   get to() {
     return this._to;
   }
 
+  /**
+   * @param {Date}
+   */
   set from(from) {
     if ((from.getTime() - this.to.getTime()) > -ONE_DAY) {
       this._to = new Date(from.getTime() + ONE_DAY);
@@ -207,6 +218,9 @@ export class Roadmap {
     this._from = from;
   }
 
+  /**
+   * @param {Date}
+   */
   set to(to) {
     if ((this.from.getTime() - to.getTime()) > -ONE_DAY) {
       this._from = new Date(to.getTime() - ONE_DAY);
@@ -214,11 +228,14 @@ export class Roadmap {
     this._to = to;
   }
 
+  /**
+   * @return {object}
+   */
   toAssoc() {
     return {
-      'tasks': this._tasks.reduce((tasks, task) => {return tasks.concat(task.toAssoc());}, []),
-      'stories': this._stories.reduce((stories, story) => {return stories.concat(story.toAssoc())}, []),
-      'assignees': this._assignees.reduce((assginees, assignee) => {return assginees.concat(assignee.toAssoc())}, [])
+      tasks: this._tasks.map(t => t.toAssoc()),
+      stories: this._stories.map(s => s.toAssoc()),
+      assignees: this._assignees.map(a => a.toAssoc())
     };
   }
 

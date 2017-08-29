@@ -2,7 +2,7 @@ import {PluginInterface} from "./PluginInterface";
 import * as d3 from 'd3';
 import ContextMenu from 'd3-v4-contextmenu';
 
-export class CanvasContextMenu extends PluginInterface{
+export class CanvasContextMenuPlugin extends PluginInterface {
   /**
    * @param {Roadmappy} roadmappy
    */

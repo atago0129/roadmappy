@@ -10,7 +10,7 @@
           target: "roadmappy",
           type: "assignee",
           baseDate: '2017-11-21',
-          span: [10, 50],
+          span: [30, 120],
           style: {
             "barHeight": 20,
             "timeFormat": "%-m月%-d日", // required d3 time format
@@ -20,7 +20,7 @@
             new window.Roadmappy.DraggableTaskPlugin(),
             new window.Roadmappy.ClickableTaskPlugin(),
             new window.Roadmappy.ClickableTaskLabelPlugin(),
-            new window.Roadmappy.CanvasContextMenu(),
+            new window.Roadmappy.CanvasContextMenuPlugin(),
             new window.Roadmappy.ClickableBarAreaPlugin()
           ]
         },

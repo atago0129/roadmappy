@@ -217,6 +217,7 @@ export class RoadmapCanvas extends EventEmitter {
     // ------------------------------------------------------------
     const enter = bars.enter()
       .append('svg')
+      .style('overflow', 'visible')
       .attr('class', 'bar');
     enter.append('rect')
       .attr('class', 'bar-background')
@@ -226,14 +227,6 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('ry', 2)
       .attr('stroke', 'none')
       .attr('fill-opacity', 0.5)
-      .call(
-        d3.drag()
-          .container(this.barArea.node())
-          .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
-          .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-      )
       .on('click', (d) => this.emit('click:task', d));
     enter.append('text')
       .attr('class', 'bar-label')
@@ -244,7 +237,15 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('font-size', this.yScale.bandwidth() / 2)
       .attr('fill', '#000')
       .attr('cursor', 'move')
-      .on('click', (d) => this.emit('click:task-label', d, d3.event.target));
+      .on('click', (d) => this.emit('click:task-label', d, d3.event.target))
+      .call(
+        d3.drag()
+          .container(this.barArea.node())
+          .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
+          .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+      );
     enter.append('text')
       .attr('class', 'bar-to-handle')
       .text('»')

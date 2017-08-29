@@ -45,9 +45,9 @@ export class AbstractRoadmapGroup {
    */
   toAssoc() {
     return {
-      'id': this.id,
-      'name': this.name,
-      'order': this.order
+      id: this.id,
+      name: this.name,
+      order: this.order
     }
   }
 }
