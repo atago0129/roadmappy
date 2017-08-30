@@ -111,7 +111,6 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         const assoc = getFormData(this.form);
         assoc.id = parseInt(assoc.id, 10);
         if (!assoc.hasOwnProperty('color')) assoc['color'] = null;
-        console.log(assoc);
         const task = this.roadmappy.roadmap.getTaskById(assoc.id);
         task.merge(assoc);
         this.roadmappy.render();
