@@ -1,6 +1,5 @@
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 import {RoadmapTask} from "./task/RoadmapTask";
-import {RoadmapStyle} from "./RoadmapStyle";
 import {RoadmapStory} from "./group/RoadmapStory";
 import {RoadmapAssignee} from "./group/RoadmapAssignee";
 
