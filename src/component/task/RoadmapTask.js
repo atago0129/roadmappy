@@ -82,8 +82,10 @@ export class RoadmapTask {
           this[name] = [].concat(assoc[name] || []).map((id) => parseInt(id, 10));
           break;
         case 'from':
+          this.from = new Date(assoc[name]);
+          break;
         case 'to':
-          this[name] = new Date(assoc[name]);
+          this.to = new Date(new Date(assoc[name]).getTime() + ONE_DAY);
           break;
         default:
           this[name] = assoc[name];
@@ -93,14 +95,15 @@ export class RoadmapTask {
   }
 
   /**
-   * @returns {{id: number, name: string, from: string, to: string, color: string, story: number|string, assignee: number[]|string[], involvement: number}}
+   * @returns {{id: number, name: string, from: string, to: string, color: string, storyId: number|string, assigneeIds: number[]|string[], involvement: number}}
    */
   toAssoc() {
+    const to = new Date(this._to.getTime() - ONE_DAY);
     return {
       id: this.id,
       name: this.name,
       from: [this._from.getFullYear(), ('0' + (this._from.getMonth() + 1)).slice(-2), ('0' + this._from.getDate()).slice(-2)].join('-'),
-      to: [this._to.getFullYear(), ('0' + (this._to.getMonth() + 1)).slice(-2), ('0' + this._to.getDate()).slice(-2)].join('-'),
+      to: [to.getFullYear(), ('0' + (to.getMonth() + 1)).slice(-2), ('0' + to.getDate()).slice(-2)].join('-'),
       color: this.color,
       storyId: this.storyId,
       assigneeIds: this.assigneeIds,
