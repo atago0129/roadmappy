@@ -39,7 +39,7 @@ export class RoadmapTask {
     this.order = parseInt(order);
     this.involvement = Math.min(parseInt(involvement, 10), 100);
     this._from = new Date(from);
-    this._to = new Date(new Date(to).setHours((new Date(to).getHours() + 24)));
+    this._to = new Date(to);
     this.from = this._from;
     this.to = this._to;
   }

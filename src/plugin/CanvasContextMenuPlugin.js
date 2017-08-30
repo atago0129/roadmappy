@@ -17,7 +17,7 @@ export class CanvasContextMenuPlugin extends PluginInterface {
     d3.event.preventDefault();
     const contextMenu = new ContextMenu([
       {
-        label: 'copy to json data to clip board.',
+        label: 'export json data to clipboard.',
         cb: this._copyToClipBoard.bind(this)
       }
     ]);
@@ -28,7 +28,7 @@ export class CanvasContextMenuPlugin extends PluginInterface {
     const dummy = document.createElement('textarea');
     document.body.appendChild(dummy);
     dummy.setAttribute('id', 'copy-dummy');
-    document.getElementById('copy-dummy').value = JSON.stringify(this.roadmappy.roadmap.toAssoc(), null, 2);
+    document.getElementById('copy-dummy').value = JSON.stringify(this.roadmappy.roadmap.toAssoc());
     dummy.select();
     document.execCommand('copy');
     document.body.removeChild(dummy);

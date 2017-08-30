@@ -3,6 +3,8 @@ import * as convertColor from 'rgb-hex';
 import {EventEmitter} from 'events';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
+const ONE_DAY = 1000 * 60 * 60 * 24;
+
 export class RoadmapCanvas extends EventEmitter {
 
   roadmap;
@@ -288,7 +290,7 @@ export class RoadmapCanvas extends EventEmitter {
     // UPDATE.
     // ------------------------------------------------------------
     const update = bars.merge(enter)
-      .attr('width', (d) => this.xScale(d.to) - this.xScale(d.from))
+      .attr('width', (d) => this.xScale(new Date(d.to.getTime() +  ONE_DAY)) - this.xScale(d.from))
       .attr('height', this.yScale.bandwidth())
       .attr('x', (d) => this.xScale(d.from))
       .attr('y', (d, i) => this.yScale(i));
