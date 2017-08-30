@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import * as convertColor from 'rgb-hex';
 import {EventEmitter} from 'events';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 
@@ -293,7 +294,7 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('y', (d, i) => this.yScale(i));
     update
       .select('.bar-background')
-      .attr('fill', (d) => d.color);
+      .attr('fill', (d) => this._defineBarColor(d));
     update
       .select('.bar-label')
       .text((d) =>  d.name);
@@ -302,6 +303,14 @@ export class RoadmapCanvas extends EventEmitter {
     // ------------------------------------------------------------
     bars.exit()
       .remove();
+  }
+
+  _defineBarColor(task) {
+    if (task.color) {
+      return task.color;
+    }
+    const hue = (parseInt(task.storyId, 10) || 0) * (340 / this.roadmap.getStories().length);
+    return '#' + convertColor(d3.hsl(hue, 1, 0.5).toString());
   }
 
   /**

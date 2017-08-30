@@ -35,7 +35,7 @@ export class RoadmapTask {
     this.name = name;
     this.storyId = storyId;
     this.assigneeIds = [].concat(assigneeIds || []);
-    this.color = color || '#4286f4';
+    this.color = color || null;
     this.order = parseInt(order);
     this.involvement = Math.min(parseInt(involvement, 10), 100);
     this._from = new Date(from);
@@ -81,6 +81,10 @@ export class RoadmapTask {
         case 'assigneeIds':
           this[name] = [].concat(assoc[name] || []).map((id) => parseInt(id, 10));
           break;
+        case 'from':
+        case 'to':
+          this[name] = new Date(assoc[name]);
+          break;
         default:
           this[name] = assoc[name];
           break;
@@ -95,8 +99,8 @@ export class RoadmapTask {
     return {
       id: this.id,
       name: this.name,
-      from: this._from.toISOString(),
-      to: this._to.toISOString(),
+      from: [this._from.getFullYear(), ('0' + (this._from.getMonth() + 1)).slice(-2), ('0' + this._from.getDate()).slice(-2)].join('-'),
+      to: [this._to.getFullYear(), ('0' + (this._to.getMonth() + 1)).slice(-2), ('0' + this._to.getDate()).slice(-2)].join('-'),
       color: this.color,
       storyId: this.storyId,
       assigneeIds: this.assigneeIds,

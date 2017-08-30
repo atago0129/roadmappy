@@ -1,13 +1,9 @@
 import {PluginInterface} from "./PluginInterface";
-import * as d3 from 'd3';
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
 import './ClickableTaskLabelPlugin.css';
 
 export class ClickableTaskLabelPlugin extends PluginInterface {
-
-  doubleClickTimerId;
-  clickCount = 0;
 
   /**
    * @param {Roadmappy} roadmappy
@@ -47,7 +43,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
           <span>story</span>
           <select name="storyId">
             <% for (const s of stories) { %>
-            <option value="<%= s.id %>"<%= task.storyId === s.id ? " selected": "" %>><%= s.name %></option>
+            <option value="<%= s.id %>"<%= task.storyId === s.id ? ' selected': '' %>><%= s.name %></option>
             <% } %>
           </select>
         </label>
@@ -57,7 +53,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
           <span>assignee</span>
           <select name="assigneeIds" multiple="true">
             <% for (const a of assignees) { %>
-            <option value="<%= a.id %>"<%= task.assigneeIds.indexOf(a.id) >= 0 ? " selected": "" %>><%= a.name %></option>
+            <option value="<%= a.id %>"<%= task.assigneeIds.indexOf(a.id) >= 0 ? ' selected': '' %>><%= a.name %></option>
             <% } %>
           </select>
         </label>
@@ -65,7 +61,20 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       <div>
         <label>
           <span>color</span>
-          <input type="color" name="color" value="<%= task.color  %>">
+          <input type="checkbox"<%= task.color !== null ? ' checked' : '' %> class="ClickableTaskLabelPlugin-form-color-checkbox">
+          <input type="color" name="color" value="<%= task.color  %>" class="ClickableTaskLabelPlugin-form-color-input"<%= task.color === null ? ' disabled style="display:none"' : '' %>>
+        </label>
+      </div>
+      <div>
+        <label>
+          <span>from</span>
+          <input type="date" name="from" value="<%= task.from  %>">
+        </label>
+      </div>
+      <div>
+        <label>
+          <span>to</span>
+          <input type="date" name="to" value="<%= task.to  %>">
         </label>
       </div>
       <div>
@@ -80,6 +89,9 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       stories: this.roadmappy.roadmap.getStories().map(s => s.toAssoc()),
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
+
+    this.colorSelect = this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox');
+    this.colorSelect.addEventListener('click', this._onClickColorSelect);
   }
 
   /**
@@ -98,6 +110,8 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       case 'save': {
         const assoc = getFormData(this.form);
         assoc.id = parseInt(assoc.id, 10);
+        if (!assoc.hasOwnProperty('color')) assoc['color'] = null;
+        console.log(assoc);
         const task = this.roadmappy.roadmap.getTaskById(assoc.id);
         task.merge(assoc);
         this.roadmappy.render();
@@ -116,6 +130,20 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         this.form.parentElement.removeChild(this.form);
         break;
       }
+    }
+  };
+
+  /**
+   * @param {Event} e
+   */
+  _onClickColorSelect = e => {
+    const colorInput = this.form.querySelector('.ClickableTaskLabelPlugin-form-color-input');
+    if (e.target.checked) {
+      colorInput.style.display = '';
+      colorInput.removeAttribute('disabled');
+    } else {
+      colorInput.style.display = 'none';
+      colorInput.setAttribute('disabled', 'true');
     }
   };
 
