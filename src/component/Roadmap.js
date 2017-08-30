@@ -1,5 +1,8 @@
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 import {RoadmapTask} from "./task/RoadmapTask";
+import {RoadmapStyle} from "./RoadmapStyle";
+import {RoadmapStory} from "./group/RoadmapStory";
+import {RoadmapAssignee} from "./group/RoadmapAssignee";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -114,7 +117,11 @@ export class Roadmap {
    * @returns {AbstractRoadmapGroup[]}
    */
   getGroups() {
-    switch (this._type) {
+    return this._getGroupsByType(this._type);
+  }
+
+  _getGroupsByType(type) {
+    switch (type) {
       case AbstractRoadmapGroup.TYPE.STORY:
         return this.getStories();
       case AbstractRoadmapGroup.TYPE.ASSIGNEE:
@@ -157,6 +164,26 @@ export class Roadmap {
         throw new Error('invalid argument.');
     }
     this._tasks.splice(index, 0, newTask);
+  }
+
+  /**
+   * @param {string} name
+   * @param {string} type
+   */
+  addNewGroup(name, type) {
+    const groups = this._getGroupsByType(type);
+    const id = Math.max.apply(null, [0].concat(groups.map(g => g.id))) + 1;
+    const order = Math.max.apply(null, [0].concat(groups.map(g => g.order))) + 1;
+    switch (type) {
+      case AbstractRoadmapGroup.TYPE.STORY:
+        this._stories.push(new RoadmapStory(id, name, order));
+        break;
+      case AbstractRoadmapGroup.TYPE.ASSIGNEE:
+        this._assignees.push(new RoadmapAssignee(id, name, order));
+        break;
+      default:
+        throw new Error('invalid argument.');
+    }
   }
 
   /**

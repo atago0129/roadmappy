@@ -5,6 +5,8 @@ import './ClickableTaskLabelPlugin.css';
 
 export class ClickableTaskLabelPlugin extends PluginInterface {
 
+  currentTask;
+
   /**
    * @param {Roadmappy} roadmappy
    */
@@ -22,6 +24,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
    * @param {Selection} labelNode
    */
   _onTaskLabelDoubleClick = (task, labelNode) => {
+    this.currentTask = task;
     this._initializeForm(task);
     this.roadmappy.canvas.element.node().appendChild(this.form);
   };
@@ -47,6 +50,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
             <% } %>
           </select>
         </label>
+        <span class="ClickableTaskLabelPlugin-form-add-group-button" data-group-type="story">+</span>
       </div>
       <div>
         <label>
@@ -57,6 +61,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
             <% } %>
           </select>
         </label>
+        <span class="ClickableTaskLabelPlugin-form-add-group-button" data-group-type="assignee">+</span>
       </div>
       <div>
         <label>
@@ -90,8 +95,14 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
 
-    this.colorSelect = this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox');
-    this.colorSelect.addEventListener('click', this._onClickColorSelect);
+    this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox').addEventListener('click', this._onClickColorSelect);
+    this.form.querySelectorAll('.ClickableTaskLabelPlugin-form-add-group-button').forEach((elm) => elm.addEventListener('click', this._onClickAddGroupButton));
+  }
+
+  _updateForm() {
+    this.form.parentElement.removeChild(this.form);
+    this._initializeForm(this.currentTask);
+    this.roadmappy.canvas.element.node().appendChild(this.form);
   }
 
   /**
@@ -116,6 +127,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         task.merge(assoc);
         this.roadmappy.render();
         this.form.parentElement.removeChild(this.form);
+        this.currentTask = null;
         break;
       }
       case 'delete': {
@@ -124,10 +136,12 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         this.roadmappy.roadmap.removeTaskById(assoc.id);
         this.roadmappy.render();
         this.form.parentElement.removeChild(this.form);
+        this.currentTask = null;
         break;
       }
       case 'cancel': {
         this.form.parentElement.removeChild(this.form);
+        this.currentTask = null;
         break;
       }
     }
@@ -146,5 +160,13 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       colorInput.setAttribute('disabled', 'true');
     }
   };
+
+  _onClickAddGroupButton = e => {
+    const type = e.target.getAttribute('data-group-type');
+    const groupName = window.prompt('enter ' + type + ' name');
+    if (groupName === '') return;
+    this.roadmappy.roadmap.addNewGroup(groupName, type);
+    this._updateForm();
+  }
 
 }
