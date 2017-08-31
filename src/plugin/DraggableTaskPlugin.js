@@ -54,7 +54,7 @@ export class DraggableTaskPlugin extends PluginInterface {
 
   _endDrag(task, pos) {
     this.roadmappy.roadmap.reorder();
-    this.dragging = false;
+    this.isDragging = false;
     this.dragStartPos = null;
   }
 
