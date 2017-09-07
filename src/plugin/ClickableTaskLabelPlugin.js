@@ -25,14 +25,17 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
    */
   _onTaskLabelDoubleClick = (task, labelNode) => {
     this.currentTask = task;
-    this._initializeForm(task);
-    this.roadmappy.canvas.element.node().appendChild(this.form);
+    this._initializeForm();
   };
 
   /**
    * @param {RoadmapTask} task
    */
-  _initializeForm(task) {
+  _initializeForm() {
+    const task = this.currentTask;
+    if (this.form.parentElement) {
+      this.form.parentElement.removeChild(this.form);
+    }
     this.form.innerHTML = template(`
       <input type="hidden" name="id" value="<%= task.id %>">
       <div>
@@ -94,15 +97,12 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       stories: this.roadmappy.roadmap.getStories().map(s => s.toAssoc()),
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
-
-    this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox').addEventListener('click', this._onClickColorSelect);
-    this.form.querySelectorAll('.ClickableTaskLabelPlugin-form-add-group-button').forEach((elm) => elm.addEventListener('click', this._onClickAddGroupButton));
-  }
-
-  _updateForm() {
-    this.form.parentElement.removeChild(this.form);
-    this._initializeForm(this.currentTask);
     this.roadmappy.canvas.element.node().appendChild(this.form);
+
+    this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox').removeEventListener('click', this._onClickColorSelect);
+    this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox').addEventListener('click', this._onClickColorSelect);
+    this.form.querySelectorAll('.ClickableTaskLabelPlugin-form-add-group-button').forEach((elm) => elm.removeEventListener('click', this._onClickAddGroupButton));
+    this.form.querySelectorAll('.ClickableTaskLabelPlugin-form-add-group-button').forEach((elm) => elm.addEventListener('click', this._onClickAddGroupButton));
   }
 
   /**
@@ -166,7 +166,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     const groupName = window.prompt('enter ' + type + ' name');
     if (groupName === '') return;
     this.roadmappy.roadmap.addNewGroup(groupName, type);
-    this._updateForm();
+    this._initializeForm();
   }
 
 }
