@@ -312,7 +312,7 @@ export class RoadmapCanvas extends EventEmitter {
       return task.color;
     }
     const hue = (parseInt(task.storyId, 10) || 0) * (340 / this.roadmap.getStories().length);
-    return '#' + convertColor(d3.hsl(hue, 1, 0.5).toString());
+    return '#' + convertColor(d3.hsl(hue, 1, 0.4).toString());
   }
 
   /**

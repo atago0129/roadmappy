@@ -32,10 +32,10 @@ export class DraggableTaskPlugin extends PluginInterface {
 
   _draggingTask(task, pos) {
     if (this.isDragging) {
+      const diff = task.to.getTime() - task.from.getTime();
       const xScale = this.roadmappy.canvas.xScale;
-      const width = xScale(task.to) - xScale(task.from);
-      task.from = xScale.invert(pos.x - width / 2);
-      task.to = xScale.invert(pos.x + width / 2);
+      task.from = new Date(xScale.invert(pos.x).getTime() - diff / 2);
+      task.to = new Date(xScale.invert(pos.x).getTime() + diff / 2);
       this.roadmappy.render();
     } else {
       this.isDragging = Math.abs(this.dragStartPos.x - pos.x) > DRAG_THRESHOLD_PIXEL;
