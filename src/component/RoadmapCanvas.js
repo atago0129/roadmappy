@@ -35,6 +35,7 @@ export class RoadmapCanvas extends EventEmitter {
     this.svg.on('contextmenu', () => this.emit('contextmenu:canvas', d3.mouse(this.svg.node())));
     this.xScale = d3.scaleTime().domain([]);
     this.yScale = d3.scaleBand().domain([]);
+    this.background = this._createBackground();
     this.xAxis = this._createXAxis();
     this.yAxis = this._createYAxis();
     this.barArea = this._createBarArea();
@@ -57,13 +58,15 @@ export class RoadmapCanvas extends EventEmitter {
     this.svg
       .attr('width', w)
       .attr('height', h)
-      .attr('style', `padding: 0 0 ${marginBottom}px ${marginLeft}px`);
+      .attr('style', `padding: 0 0 ${marginBottom}px 0`);
 
     // create chart.
     this._updateXScale(w);
     this._updateYScale(tasks, h);
-    this._updateXAxis(w, h);
-    this._updateYAxis();
+    this._updateXAxis(marginLeft, w, h);
+    this._updateYAxis(marginLeft);
+    this._updateBackground(h);
+    this._updateBarArea(marginLeft);
     this._updateTaskBars(tasks);
   }
 
@@ -73,6 +76,15 @@ export class RoadmapCanvas extends EventEmitter {
         return group;
       }));
     }, []);
+  }
+
+  _createBackground() {
+    return this.svg.append('svg')
+      .attr('class', 'background')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('x', 0)
+      .attr('y', 0);
   }
 
   /**
@@ -159,16 +171,20 @@ export class RoadmapCanvas extends EventEmitter {
   }
 
   /**
+   * @param {number} marginLeft
    * @param {number} w
    * @param {number} h
    */
-  _updateXAxis(w, h) {
+  _updateXAxis(marginLeft, w, h) {
     this.xAxis.call(
       d3.axisBottom(this.xScale)
       .ticks(this.style.tickInterval)
       .tickSize(-h, 0, 0)
       .tickFormat(this.style.timeFormat)
     );
+
+    this.xAxis
+      .attr('x', marginLeft);
 
     this.xAxis
       .selectAll('.tick line')
@@ -194,8 +210,10 @@ export class RoadmapCanvas extends EventEmitter {
 
   /**
    * _updateYAxis.
+   * @param {number} marginLeft
+   * @private
    */
-  _updateYAxis() {
+  _updateYAxis(marginLeft) {
     this.yAxis.call(
       d3.axisLeft(this.yScale)
       .tickSize(0)
@@ -207,6 +225,49 @@ export class RoadmapCanvas extends EventEmitter {
         }
       })
     );
+    this.yAxis
+      .attr('x', marginLeft);
+  }
+
+  /**
+   * @param {number} h
+   * @private
+   */
+  _updateBackground(h) {
+    let colorMap = [
+      '#f9f9f9',
+      '#eeeeee'
+    ];
+    const gap = h / this.yAxisMap.length;
+    const background = this.background.selectAll('rect').data(this.yAxisMap);
+    const enter = background.enter()
+      .append('rect');
+    background.merge(enter)
+      .attr('fill', (d, i) => {
+        if (this.yAxisMap[i - 1] !== this.yAxisMap[i]) {
+          colorMap.reverse();
+        }
+        return colorMap[0]
+      })
+      .attr('x', 0)
+      .attr('y', (d, i) => {
+        if (i === 0) {
+          return 0;
+        } else {
+          return i * gap + this.yScale.paddingOuter();
+        }
+      })
+      .attr('width', '100%')
+      .attr('height', gap + 1);
+  }
+
+  /**
+   * @param {number} marginLeft
+   * @private
+   */
+  _updateBarArea(marginLeft) {
+    this.barArea
+      .attr('x', marginLeft);
   }
 
   /**
