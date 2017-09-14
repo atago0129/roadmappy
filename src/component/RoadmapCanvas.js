@@ -268,6 +268,64 @@ export class RoadmapCanvas extends EventEmitter {
   _updateBarArea(marginLeft) {
     this.barArea
       .attr('x', marginLeft);
+
+    const mouseLine = this.barArea
+      .append('line')
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", 0)
+      .style("stroke", "black")
+      .style("stroke-width", "1px")
+      .style("stroke-dasharray", "2,2")
+      .style("shape-rendering", "crispEdges")
+      .style("pointer-events", "none")
+      .style("display", "none");
+    const mouseBox = this.barArea
+      .append('rect')
+      .attr("rx", 3)
+      .attr("ry", 3)
+      .attr("height", this.style.barHeight)
+      .attr("stroke", "none")
+      .attr("fill", "black")
+      .attr("fill-opacity", 0.8)
+      .style("display", "none");
+    const mouseText = this.barArea
+      .append('text')
+      .attr("font-size", 11)
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .attr("text-height", this.style.barHeight)
+      .attr("fill", "white")
+      .style("display", "none");
+
+    this.barArea
+      .on('mousemove', () => {
+        const mouseX = d3.mouse(this.barArea.node())[0];
+        const mouseY = d3.mouse(this.barArea.node())[1];
+        mouseLine
+          .attr("x1", mouseX)
+          .attr("y1", 0)
+          .attr("x2", mouseX)
+          .attr("y2", this.barArea.attr('height'))
+          .style("display", "block");
+        mouseText
+          .attr("transform", "translate(" + mouseX + "," + (mouseY + 40) + ")")
+          .text(this.style.timeFormat(this.xScale.invert(mouseX)))
+          .style("display", "block");
+        mouseBox
+          .attr("x", mouseX - 25)
+          .attr("y", mouseY - (this.style.barHeight + 8) / 2 + 40)
+          .style('width', mouseText.node().getBBox().width + 5)
+          .style("display", "block");
+      });
+    this.barArea
+      .on('mouseleave', () => {
+        mouseLine.style("display", "none");
+        mouseText.style("display", "none");
+        mouseBox.style("display", "none");
+      });
+
   }
 
   /**
