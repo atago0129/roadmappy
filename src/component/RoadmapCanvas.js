@@ -39,9 +39,7 @@ export class RoadmapCanvas extends EventEmitter {
     this.xAxis = this._createXAxis();
     this.yAxis = this._createYAxis();
     this.barArea = this._createBarArea();
-    this.mouseLine = this._createMouseLine();
-    this.mouseBox = this._createMouseBox();
-    this.mouseText = this._createMouseText();
+    this.mouseDate = this._createMouseDate();
     this.roadmap.reorder();
   }
 
@@ -148,35 +146,34 @@ export class RoadmapCanvas extends EventEmitter {
           this.render();
         }, true)
     );
+    barArea.on('mousemove', () => {
+      this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+    });
+    barArea
+      .on('mouseleave', () => {
+        this.mouseDate.select('.mouse-date-line').style("display", "none");
+        this.mouseDate.select('.mouse-date-text').style("display", "none");
+        this.mouseDate.select('.mouse-date-box').style("display", "none");
+      });
     return barArea;
   }
 
   /**
+   * @returns {selection}
    * @private
-   * @return {selection}
    */
-  _createMouseLine() {
-    return this.barArea
-      .append('line')
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", 0)
-      .attr("y2", 0)
+  _createMouseDate() {
+    const mouseDate = this.barArea.append('svg');
+    mouseDate.append('line')
+      .attr('class', 'mouse-date-line')
       .style("stroke", "black")
       .style("stroke-width", "1px")
       .style("stroke-dasharray", "2,2")
       .style("shape-rendering", "crispEdges")
       .style("pointer-events", "none")
       .style("display", "none");
-  }
-
-  /**
-   * @private
-   * @return {selection}
-   */
-  _createMouseBox() {
-    return this.barArea
-      .append('rect')
+    mouseDate.append('rect')
+      .attr('class', 'mouse-date-box')
       .attr("rx", 3)
       .attr("ry", 3)
       .attr("height", this.style.barHeight)
@@ -184,21 +181,15 @@ export class RoadmapCanvas extends EventEmitter {
       .attr("fill", "black")
       .attr("fill-opacity", 0.8)
       .style("display", "none");
-  }
-
-  /**
-   * @private
-   * @return {selection}
-   */
-  _createMouseText() {
-    return this.barArea
-      .append('text')
+    mouseDate.append('text')
+      .attr('class', 'mouse-date-text')
       .attr("font-size", 11)
       .attr("font-weight", "bold")
       .attr("text-anchor", "middle")
       .attr("text-height", this.style.barHeight)
       .attr("fill", "white")
       .style("display", "none");
+    return mouseDate;
   }
 
   /**
@@ -324,17 +315,6 @@ export class RoadmapCanvas extends EventEmitter {
   _updateBarArea(marginLeft) {
     this.barArea
       .attr('x', marginLeft);
-
-    this.barArea
-      .on('mousemove', () => {
-        this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
-      });
-    this.barArea
-      .on('mouseleave', () => {
-        this.mouseLine.style("display", "none");
-        this.mouseText.style("display", "none");
-        this.mouseBox.style("display", "none");
-      });
   }
 
   /**
@@ -343,20 +323,20 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _updateMouseDate(mouseX, mouseY) {
-    this.mouseLine
+    this.barArea.select('.mouse-date-line')
       .attr("x1", mouseX)
       .attr("y1", 0)
       .attr("x2", mouseX)
       .attr("y2", this.barArea.attr('height'))
       .style("display", "block");
-    this.mouseText
+    this.mouseDate.select('.mouse-date-text')
       .attr("transform", "translate(" + mouseX + "," + (mouseY + 40) + ")")
       .text(this.style.timeFormat(this.xScale.invert(mouseX)))
       .style("display", "block");
-    this.mouseBox
-      .attr("x", mouseX - (this.mouseText.node().getBBox().width + 5) / 2)
+    this.mouseDate.select('.mouse-date-box')
+      .attr("x", mouseX - (this.mouseDate.select('.mouse-date-text').node().getBBox().width + 5) / 2)
       .attr("y", mouseY - (this.style.barHeight + 8) / 2 + 40)
-      .style('width', this.mouseText.node().getBBox().width + 5)
+      .style('width', this.mouseDate.select('.mouse-date-text').node().getBBox().width + 5)
       .style("display", "block");
   }
 
