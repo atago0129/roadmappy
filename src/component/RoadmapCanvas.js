@@ -39,6 +39,9 @@ export class RoadmapCanvas extends EventEmitter {
     this.xAxis = this._createXAxis();
     this.yAxis = this._createYAxis();
     this.barArea = this._createBarArea();
+    this.mouseLine = this._createMouseLine();
+    this.mouseBox = this._createMouseBox();
+    this.mouseText = this._createMouseText();
     this.roadmap.reorder();
   }
 
@@ -138,6 +141,7 @@ export class RoadmapCanvas extends EventEmitter {
           };
         })
         .on('drag', () => {
+          this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
           const diff = this.xScale.invert(d3.event.subject.x).getTime() - this.xScale.invert(d3.event.x).getTime();
           this.roadmap.from = new Date(d3.event.subject.from.getTime() + diff);
           this.roadmap.to = new Date(d3.event.subject.to.getTime() + diff);
@@ -145,6 +149,56 @@ export class RoadmapCanvas extends EventEmitter {
         }, true)
     );
     return barArea;
+  }
+
+  /**
+   * @private
+   * @return {selection}
+   */
+  _createMouseLine() {
+    return this.barArea
+      .append('line')
+      .attr("x1", 0)
+      .attr("y1", 0)
+      .attr("x2", 0)
+      .attr("y2", 0)
+      .style("stroke", "black")
+      .style("stroke-width", "1px")
+      .style("stroke-dasharray", "2,2")
+      .style("shape-rendering", "crispEdges")
+      .style("pointer-events", "none")
+      .style("display", "none");
+  }
+
+  /**
+   * @private
+   * @return {selection}
+   */
+  _createMouseBox() {
+    return this.barArea
+      .append('rect')
+      .attr("rx", 3)
+      .attr("ry", 3)
+      .attr("height", this.style.barHeight)
+      .attr("stroke", "none")
+      .attr("fill", "black")
+      .attr("fill-opacity", 0.8)
+      .style("display", "none");
+  }
+
+  /**
+   * @private
+   * @return {selection}
+   */
+  _createMouseText() {
+    return this.barArea
+      .append('text')
+      .attr("font-size", 11)
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .attr("text-height", this.style.barHeight)
+      .attr("fill", "white")
+      .style("display", "none");
   }
 
   /**
@@ -234,20 +288,22 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _updateBackground(h) {
-    let colorMap = [
-      '#f9f9f9',
-      '#eeeeee'
-    ];
+    const colorMap = this.style.backgroundColors.reduce((colors, color) => {
+      return colors.concat(color);
+    }, []);
     const gap = h / this.yAxisMap.length;
     const background = this.background.selectAll('rect').data(this.yAxisMap);
+
+    let groupIndex = -1;
+
     const enter = background.enter()
       .append('rect');
     background.merge(enter)
       .attr('fill', (d, i) => {
         if (this.yAxisMap[i - 1] !== this.yAxisMap[i]) {
-          colorMap.reverse();
+          groupIndex++;
         }
-        return colorMap[0]
+        return colorMap[groupIndex % colorMap.length]
       })
       .attr('x', 0)
       .attr('y', (d, i) => {
@@ -269,63 +325,39 @@ export class RoadmapCanvas extends EventEmitter {
     this.barArea
       .attr('x', marginLeft);
 
-    const mouseLine = this.barArea
-      .append('line')
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", 0)
-      .attr("y2", 0)
-      .style("stroke", "black")
-      .style("stroke-width", "1px")
-      .style("stroke-dasharray", "2,2")
-      .style("shape-rendering", "crispEdges")
-      .style("pointer-events", "none")
-      .style("display", "none");
-    const mouseBox = this.barArea
-      .append('rect')
-      .attr("rx", 3)
-      .attr("ry", 3)
-      .attr("height", this.style.barHeight)
-      .attr("stroke", "none")
-      .attr("fill", "black")
-      .attr("fill-opacity", 0.8)
-      .style("display", "none");
-    const mouseText = this.barArea
-      .append('text')
-      .attr("font-size", 11)
-      .attr("font-weight", "bold")
-      .attr("text-anchor", "middle")
-      .attr("text-height", this.style.barHeight)
-      .attr("fill", "white")
-      .style("display", "none");
-
     this.barArea
       .on('mousemove', () => {
-        const mouseX = d3.mouse(this.barArea.node())[0];
-        const mouseY = d3.mouse(this.barArea.node())[1];
-        mouseLine
-          .attr("x1", mouseX)
-          .attr("y1", 0)
-          .attr("x2", mouseX)
-          .attr("y2", this.barArea.attr('height'))
-          .style("display", "block");
-        mouseText
-          .attr("transform", "translate(" + mouseX + "," + (mouseY + 40) + ")")
-          .text(this.style.timeFormat(this.xScale.invert(mouseX)))
-          .style("display", "block");
-        mouseBox
-          .attr("x", mouseX - 25)
-          .attr("y", mouseY - (this.style.barHeight + 8) / 2 + 40)
-          .style('width', mouseText.node().getBBox().width + 5)
-          .style("display", "block");
+        this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
       });
     this.barArea
       .on('mouseleave', () => {
-        mouseLine.style("display", "none");
-        mouseText.style("display", "none");
-        mouseBox.style("display", "none");
+        this.mouseLine.style("display", "none");
+        this.mouseText.style("display", "none");
+        this.mouseBox.style("display", "none");
       });
+  }
 
+  /**
+   * @param {number} mouseX
+   * @param {number} mouseY
+   * @private
+   */
+  _updateMouseDate(mouseX, mouseY) {
+    this.mouseLine
+      .attr("x1", mouseX)
+      .attr("y1", 0)
+      .attr("x2", mouseX)
+      .attr("y2", this.barArea.attr('height'))
+      .style("display", "block");
+    this.mouseText
+      .attr("transform", "translate(" + mouseX + "," + (mouseY + 40) + ")")
+      .text(this.style.timeFormat(this.xScale.invert(mouseX)))
+      .style("display", "block");
+    this.mouseBox
+      .attr("x", mouseX - (this.mouseText.node().getBBox().width + 5) / 2)
+      .attr("y", mouseY - (this.style.barHeight + 8) / 2 + 40)
+      .style('width', this.mouseText.node().getBBox().width + 5)
+      .style("display", "block");
   }
 
   /**
@@ -365,7 +397,10 @@ export class RoadmapCanvas extends EventEmitter {
           .container(this.barArea.node())
           .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => {
+            this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+            this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y});
+          })
           .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
     enter.append('text')
@@ -383,7 +418,10 @@ export class RoadmapCanvas extends EventEmitter {
           .container(this.barArea.node())
           .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => {
+            this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+            this.emit('drag:drag:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y});
+          })
           .on('end', (d) => this.emit('drag:end:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
     enter.append('text')
@@ -401,7 +439,10 @@ export class RoadmapCanvas extends EventEmitter {
           .container(this.barArea.node())
           .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => {
+            this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+            this.emit('drag:drag:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y});
+          })
           .on('end', (d) => this.emit('drag:end:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
 

@@ -5,7 +5,10 @@ export class RoadmapStyle {
   barPadding = 0.1;
   timeFormat = d3.timeFormat('%b %d');
   tickInterval = d3.timeMonday;
-  gap;
+  backgroundColors = [
+    '#f9f9f9',
+    '#eeeeee'
+  ];
 
   /**
    * @param {object} style
@@ -20,6 +23,8 @@ export class RoadmapStyle {
     if (style.tickInterval !== undefined && d3.hasOwnProperty(style.tickInterval)) {
       this.tickInterval = d3[style.tickInterval];
     }
-    this.gap = this.barHeight + 4;
+    if (style.backgroundColors !== undefined) {
+      this.backgroundColors = [].concat(style.backgroundColors);
+    }
   }
 }
