@@ -39,6 +39,7 @@ export class RoadmapCanvas extends EventEmitter {
     this.xAxis = this._createXAxis();
     this.yAxis = this._createYAxis();
     this.barArea = this._createBarArea();
+    this.mouseDate = this._createMouseDate();
     this.roadmap.reorder();
   }
 
@@ -138,13 +139,57 @@ export class RoadmapCanvas extends EventEmitter {
           };
         })
         .on('drag', () => {
+          this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
           const diff = this.xScale.invert(d3.event.subject.x).getTime() - this.xScale.invert(d3.event.x).getTime();
           this.roadmap.from = new Date(d3.event.subject.from.getTime() + diff);
           this.roadmap.to = new Date(d3.event.subject.to.getTime() + diff);
           this.render();
         }, true)
     );
+    barArea.on('mousemove', () => {
+      this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+    });
+    barArea
+      .on('mouseleave', () => {
+        this.mouseDate.select('.mouse-date-line').style("display", "none");
+        this.mouseDate.select('.mouse-date-text').style("display", "none");
+        this.mouseDate.select('.mouse-date-box').style("display", "none");
+      });
     return barArea;
+  }
+
+  /**
+   * @returns {selection}
+   * @private
+   */
+  _createMouseDate() {
+    const mouseDate = this.barArea.append('svg');
+    mouseDate.append('line')
+      .attr('class', 'mouse-date-line')
+      .style("stroke", "black")
+      .style("stroke-width", "1px")
+      .style("stroke-dasharray", "2,2")
+      .style("shape-rendering", "crispEdges")
+      .style("pointer-events", "none")
+      .style("display", "none");
+    mouseDate.append('rect')
+      .attr('class', 'mouse-date-box')
+      .attr("rx", 3)
+      .attr("ry", 3)
+      .attr("height", this.style.barHeight)
+      .attr("stroke", "none")
+      .attr("fill", "black")
+      .attr("fill-opacity", 0.8)
+      .style("display", "none");
+    mouseDate.append('text')
+      .attr('class', 'mouse-date-text')
+      .attr("font-size", 11)
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .attr("text-height", this.style.barHeight)
+      .attr("fill", "white")
+      .style("display", "none");
+    return mouseDate;
   }
 
   /**
@@ -234,20 +279,22 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _updateBackground(h) {
-    let colorMap = [
-      '#f9f9f9',
-      '#eeeeee'
-    ];
+    const colorMap = this.style.backgroundColors.reduce((colors, color) => {
+      return colors.concat(color);
+    }, []);
     const gap = h / this.yAxisMap.length;
     const background = this.background.selectAll('rect').data(this.yAxisMap);
+
+    let groupIndex = -1;
+
     const enter = background.enter()
       .append('rect');
     background.merge(enter)
       .attr('fill', (d, i) => {
         if (this.yAxisMap[i - 1] !== this.yAxisMap[i]) {
-          colorMap.reverse();
+          groupIndex++;
         }
-        return colorMap[0]
+        return colorMap[groupIndex % colorMap.length]
       })
       .attr('x', 0)
       .attr('y', (d, i) => {
@@ -268,6 +315,29 @@ export class RoadmapCanvas extends EventEmitter {
   _updateBarArea(marginLeft) {
     this.barArea
       .attr('x', marginLeft);
+  }
+
+  /**
+   * @param {number} mouseX
+   * @param {number} mouseY
+   * @private
+   */
+  _updateMouseDate(mouseX, mouseY) {
+    this.barArea.select('.mouse-date-line')
+      .attr("x1", mouseX)
+      .attr("y1", 0)
+      .attr("x2", mouseX)
+      .attr("y2", this.barArea.attr('height'))
+      .style("display", "block");
+    this.mouseDate.select('.mouse-date-text')
+      .attr("transform", "translate(" + mouseX + "," + (mouseY + 40) + ")")
+      .text(this.style.timeFormat(this.xScale.invert(mouseX)))
+      .style("display", "block");
+    this.mouseDate.select('.mouse-date-box')
+      .attr("x", mouseX - (this.mouseDate.select('.mouse-date-text').node().getBBox().width + 5) / 2)
+      .attr("y", mouseY - (this.style.barHeight + 8) / 2 + 40)
+      .style('width', this.mouseDate.select('.mouse-date-text').node().getBBox().width + 5)
+      .style("display", "block");
   }
 
   /**
@@ -307,7 +377,10 @@ export class RoadmapCanvas extends EventEmitter {
           .container(this.barArea.node())
           .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => {
+            this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+            this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y});
+          })
           .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
     enter.append('text')
@@ -325,7 +398,10 @@ export class RoadmapCanvas extends EventEmitter {
           .container(this.barArea.node())
           .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => {
+            this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+            this.emit('drag:drag:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y});
+          })
           .on('end', (d) => this.emit('drag:end:task:to', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
     enter.append('text')
@@ -343,7 +419,10 @@ export class RoadmapCanvas extends EventEmitter {
           .container(this.barArea.node())
           .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
           .on('start', (d) => this.emit('drag:start:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
-          .on('drag', (d) => this.emit('drag:drag:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => {
+            this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+            this.emit('drag:drag:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y});
+          })
           .on('end', (d) => this.emit('drag:end:task:from', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
 
