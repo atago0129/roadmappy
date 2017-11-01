@@ -98,7 +98,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
 
-    // タスクの右下に表示
+    // display in right down of the task
     const taskLabelRect = labelNode.getBoundingClientRect();
     this.form.style.left = `${taskLabelRect.x + taskLabelRect.width}px`;
     this.form.style.top = `${taskLabelRect.y + taskLabelRect.height}px`;
