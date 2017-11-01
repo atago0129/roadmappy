@@ -25,13 +25,13 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
    */
   _onTaskLabelDoubleClick = (task, labelNode) => {
     this.currentTask = task;
-    this._initializeForm();
+    this._initializeForm(labelNode);
   };
 
   /**
-   * @param {RoadmapTask} task
+   * @param {Selection} labelNode
    */
-  _initializeForm() {
+  _initializeForm(labelNode) {
     const task = this.currentTask;
     if (this.form.parentElement) {
       this.form.parentElement.removeChild(this.form);
@@ -97,6 +97,12 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       stories: this.roadmappy.roadmap.getStories().map(s => s.toAssoc()),
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
+
+    // タスクの右下に表示
+    const taskLabelRect = labelNode.getBoundingClientRect();
+    this.form.style.left = `${taskLabelRect.x + taskLabelRect.width}px`;
+    this.form.style.top = `${taskLabelRect.y + taskLabelRect.height}px`;
+
     this.roadmappy.canvas.element.node().appendChild(this.form);
 
     this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox').removeEventListener('click', this._onClickColorSelect);
