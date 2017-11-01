@@ -31,6 +31,10 @@ export class RoadmapCanvas extends EventEmitter {
    * @private
    */
   _init() {
+    if (this.element.style('position') === 'static') {
+      this.element.style('position', 'relative');
+    }
+
     this.svg = this.element.append('svg').attr('style', 'overflow: visible');
     this.svg.on('contextmenu', () => this.emit('contextmenu:canvas', d3.mouse(this.svg.node())));
     this.xScale = d3.scaleTime().domain([]);
