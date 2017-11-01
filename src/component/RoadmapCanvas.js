@@ -41,6 +41,8 @@ export class RoadmapCanvas extends EventEmitter {
     this.barArea = this._createBarArea();
     this.mouseDate = this._createMouseDate();
     this.roadmap.reorder();
+    window.addEventListener('scroll', this._onViewportChange.bind(this));
+    window.addEventListener('resize', this._onViewportChange.bind(this));
   }
 
   render() {
@@ -513,6 +515,10 @@ export class RoadmapCanvas extends EventEmitter {
   _invertYScale(y) {
     const step = this.yScale.step();
     return this.yScale.domain()[Math.floor(y / step)];
+  }
+
+  _onViewportChange(e) {
+    this.render();
   }
 
 }
