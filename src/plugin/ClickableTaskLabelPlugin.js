@@ -100,8 +100,9 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
 
     // display in right down of the task
     const taskLabelRect = labelNode.getBoundingClientRect();
-    this.form.style.left = `${taskLabelRect.x + taskLabelRect.width}px`;
-    this.form.style.top = `${taskLabelRect.y + taskLabelRect.height}px`;
+    const canvasRect = this.roadmappy.canvas.element.node().getBoundingClientRect();
+    this.form.style.left = `${taskLabelRect.x + taskLabelRect.width - canvasRect.x}px`;
+    this.form.style.top = `${taskLabelRect.y + taskLabelRect.height - canvasRect.y}px`;
 
     this.roadmappy.canvas.element.node().appendChild(this.form);
 
