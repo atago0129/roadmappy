@@ -49,7 +49,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
           <span>story</span>
           <select name="storyId">
             <% for (const s of stories) { %>
-            <option value="<%= s.id %>"<%= task.storyId === s.id ? ' selected': '' %>><%= s.name %></option>
+            <option value="<%= s.id %>"<%= task.storyId == s.id ? ' selected': '' %>><%= s.name %></option>
             <% } %>
           </select>
         </label>
