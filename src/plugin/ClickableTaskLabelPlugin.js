@@ -2,6 +2,7 @@ import {PluginInterface} from "./PluginInterface";
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
 import './ClickableTaskLabelPlugin.css';
+import * as d3 from 'd3';
 
 export class ClickableTaskLabelPlugin extends PluginInterface {
 
@@ -98,11 +99,8 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
 
-    // display in right down of the task
-    const taskLabelRect = labelNode.getBoundingClientRect();
-    const canvasRect = this.roadmappy.canvas.element.node().getBoundingClientRect();
-    this.form.style.left = `${taskLabelRect.x + taskLabelRect.width - canvasRect.x}px`;
-    this.form.style.top = `${taskLabelRect.y + taskLabelRect.height - canvasRect.y}px`;
+    this.form.style.left = `${d3.event.offsetX + 16}px`;
+    this.form.style.top = `${d3.event.offsetY + 16}px`;
 
     this.roadmappy.canvas.element.node().appendChild(this.form);
 
