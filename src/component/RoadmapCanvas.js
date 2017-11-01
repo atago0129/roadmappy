@@ -377,7 +377,10 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('font-size', this.yScale.bandwidth() / 2)
       .attr('fill', '#000')
       .attr('cursor', 'move')
-      .on('click', (d) => this.emit('click:task-label', d, d3.event.target))
+      .on('click', (d) => {
+        const [x, y] = d3.mouse(this.element.node());
+        this.emit('click:task-label', d, d3.event.target, {x, y});
+      })
       .call(
         d3.drag()
           .container(this.barArea.node())

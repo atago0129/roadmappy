@@ -2,7 +2,6 @@ import {PluginInterface} from "./PluginInterface";
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
 import './ClickableTaskLabelPlugin.css';
-import * as d3 from 'd3';
 
 export class ClickableTaskLabelPlugin extends PluginInterface {
 
@@ -23,16 +22,17 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
   /**
    * @param {RoadmapTask} task
    * @param {Selection} labelNode
+   * @param {{x,y}} pos
    */
-  _onTaskLabelDoubleClick = (task, labelNode) => {
+  _onTaskLabelDoubleClick = (task, labelNode, pos) => {
     this.currentTask = task;
-    this._initializeForm(labelNode);
+    this._initializeForm(pos);
   };
 
   /**
-   * @param {Selection} labelNode
+   * @param {{x,y}} pos
    */
-  _initializeForm(labelNode) {
+  _initializeForm(pos) {
     const task = this.currentTask;
     if (this.form.parentElement) {
       this.form.parentElement.removeChild(this.form);
@@ -99,8 +99,8 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
     });
 
-    this.form.style.left = `${d3.event.offsetX + 16}px`;
-    this.form.style.top = `${d3.event.offsetY + 16}px`;
+    this.form.style.left = `${pos.x}px`;
+    this.form.style.top = `${pos.y}px`;
 
     this.roadmappy.canvas.element.node().appendChild(this.form);
 
