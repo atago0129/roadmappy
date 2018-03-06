@@ -166,6 +166,16 @@ export class Roadmap {
   }
 
   /**
+   * @param {number} taskId
+   */
+  copyTask(taskId) {
+    const targetTask = this.getTaskById(taskId);
+    const newTaskId = Math.max.apply(null, [0].concat(this._tasks.map(t => t.id))) + 1;
+    const newTask = new RoadmapTask(newTaskId, '[copy]' + targetTask.name, targetTask.storyId, targetTask.assigneeIds, targetTask.color, targetTask.order, targetTask.from, targetTask.to, targetTask.involvement);
+    this._tasks.push(newTask);
+  }
+
+  /**
    * @param {string} name
    * @param {string} type
    */
