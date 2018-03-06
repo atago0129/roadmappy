@@ -91,6 +91,8 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         /
         <input type="submit" value="Delete" data-button-type="delete">
         /
+        <input type="submit" value="Copy" data-button-type="copy">
+        /
         <input type="submit" value="Cancel" data-button-type="cancel">
       </div>
     `)({
@@ -139,6 +141,15 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
         const assoc = getFormData(this.form);
         assoc.id = parseInt(assoc.id, 10);
         this.roadmappy.roadmap.removeTaskById(assoc.id);
+        this.roadmappy.render();
+        this.form.parentElement.removeChild(this.form);
+        this.currentTask = null;
+        break;
+      }
+      case 'copy': {
+        const assoc = getFormData(this.form);
+        assoc.id = parseInt(assoc.id, 10);
+        this.roadmappy.roadmap.copyTask(assoc.id);
         this.roadmappy.render();
         this.form.parentElement.removeChild(this.form);
         this.currentTask = null;
