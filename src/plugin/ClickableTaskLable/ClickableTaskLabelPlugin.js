@@ -1,4 +1,6 @@
-import {PluginInterface} from "./PluginInterface";
+import {PluginInterface} from "../PluginInterface";
+import i18next from 'i18next';
+import translationJa from './locales/ja/translation';
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
 import './ClickableTaskLabelPlugin.css';
@@ -17,6 +19,14 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     this.form.addEventListener('submit', this._onSubmit);
     this.form.addEventListener('click', this._onClick);
     roadmappy.on('click:task-label', this.toOnDoubleClick(this._onTaskLabelDoubleClick));
+    i18next
+      .init({
+        fallbackLng: this.roadmappy.roadmap.getLanguage(),
+        debug: true,
+        resources: {
+          ja: {translation: translationJa}
+        }
+      });
   }
 
   /**
@@ -41,13 +51,13 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       <input type="hidden" name="id" value="<%= task.id %>">
       <div>
         <label>
-          <span>name</span>
+          <span><%= i18next.t('Task name') %></span>
           <input type="text" name="name" value="<%= task.name  %>">
         </label>
       </div>
       <div>
         <label>
-          <span>story</span>
+          <span><%= i18next.t('Story') %></span>
           <select name="storyId">
             <% for (const s of stories) { %>
             <option value="<%= s.id %>"<%= task.storyId == s.id ? ' selected': '' %>><%= s.name %></option>
@@ -58,7 +68,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       </div>
       <div>
         <label>
-          <span>assignee</span>
+          <span><%= i18next.t('Assignee') %></span>
           <select name="assigneeIds" multiple="true">
             <% for (const a of assignees) { %>
             <option value="<%= a.id %>"<%= task.assigneeIds.indexOf(a.id) >= 0 ? ' selected': '' %>><%= a.name %></option>
@@ -69,38 +79,40 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       </div>
       <div>
         <label>
-          <span>color</span>
+          <span><%= i18next.t('Color') %></span>
           <input type="checkbox"<%= task.color !== null ? ' checked' : '' %> class="ClickableTaskLabelPlugin-form-color-checkbox">
           <input type="color" name="color" value="<%= task.color  %>" class="ClickableTaskLabelPlugin-form-color-input"<%= task.color === null ? ' disabled style="display:none"' : '' %>>
-          <div class="ClickableTaskLabelPlugin-form-color-all-story" style="display:none"> - <input type="checkbox" name="colorForAllStory"> Applies to all tasks belonging to the same story(Apply when saving)</div>
+          <div class="ClickableTaskLabelPlugin-form-color-all-story" style="display:none"> - <input type="checkbox" name="colorForAllStory"> <%= i18next.t('Applies to all tasks belonging to the same story(Apply when saving)') %></div>
         </label>
       </div>
       <div>
         <label>
-          <span>from</span>
+          <span><%= i18next.t('From') %></span>
           <input type="date" name="from" value="<%= task.from  %>">
         </label>
       </div>
       <div>
         <label>
-          <span>to</span>
+          <span><%= i18next.t('To') %></span>
           <input type="date" name="to" value="<%= task.to  %>">
         </label>
       </div>
       <div>
-        <input type="submit" value="Save" data-button-type="save">
+        <input type="submit" value="<%= i18next.t('Save') %>" data-button-type="save">
         /
-        <input type="submit" value="Delete" data-button-type="delete">
+        <input type="submit" value="<%= i18next.t('Delete') %>" data-button-type="delete">
         /
-        <input type="submit" value="Copy" data-button-type="copy">
+        <input type="submit" value="<%= i18next.t('Copy') %>" data-button-type="copy">
         /
-        <input type="submit" value="Cancel" data-button-type="cancel">
+        <input type="submit" value="<%= i18next.t('Cancel') %>" data-button-type="cancel">
       </div>
     `)({
       task: task.toAssoc(),
       stories: this.roadmappy.roadmap.getStories().map(s => s.toAssoc()),
       assignees: this.roadmappy.roadmap.getAssignees().map(a => a.toAssoc()),
+      i18next: i18next
     });
+
 
     this.form.style.left = `${pos.x}px`;
     this.form.style.top = `${pos.y}px`;

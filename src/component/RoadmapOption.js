@@ -2,6 +2,7 @@ import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 import {RoadmapStyle} from './RoadmapStyle';
 
 export class RoadmapOption {
+  lang;
   type;
   baseDate;
   span;
@@ -13,6 +14,7 @@ export class RoadmapOption {
    * @param {object} options
    */
   constructor(options) {
+    this.lang = options.hasOwnProperty('lang') ? options.lang : 'en';
     this.type = AbstractRoadmapGroup.isValidType(options.type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
     this.baseDate = new Date(options['baseDate'] || new Date());
     this.span = [].concat(options['span'] || [30, 30]);
