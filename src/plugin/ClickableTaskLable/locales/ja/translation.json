@@ -9,5 +9,7 @@
   "Delete": "削除",
   "Copy": "コピー",
   "Cancel": "キャンセル",
-  "Applies to all tasks belonging to the same story(Apply when saving)": "同じストーリーに所属するタスクにも適用（保存時に適用されます）"
+  "Applies to all tasks belonging to the same story(Apply when saving)": "同じストーリーに所属するタスクにも適用（保存時に適用されます）",
+  "Enter assignee name": "追加する担当者の名前を入力してください",
+  "Enter story name": "追加するストーリー名を入力してください"
 }
