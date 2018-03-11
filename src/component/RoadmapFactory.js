@@ -12,6 +12,7 @@ export class RoadmapFactory {
    */
   create(option, dataSet) {
     return new Roadmap(
+      option.lang,
       option.type,
       option.baseDate,
       option.span,

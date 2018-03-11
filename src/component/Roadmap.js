@@ -7,6 +7,7 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export class Roadmap {
 
+  _lang = null;
   _type = null;
   _from = null;
   _to = null;
@@ -15,6 +16,7 @@ export class Roadmap {
   _assignees = [];
 
   /**
+   * @param {string} lang
    * @param {string} type
    * @param {Date} baseDate
    * @param {array} span
@@ -22,7 +24,8 @@ export class Roadmap {
    * @param {RoadmapStory[]} stories
    * @param {RoadmapAssignee[]} assignees
    */
-  constructor(type, baseDate, span, tasks, stories, assignees) {
+  constructor(lang, type, baseDate, span, tasks, stories, assignees) {
+    this._lang = lang;
     this._type = type || AbstractRoadmapGroup.TYPE.STORY;
     this._tasks = this._tasks.concat(tasks || []);
     this._stories = this._stories.concat(stories || []);
@@ -45,6 +48,13 @@ export class Roadmap {
         this.addEmptyTask(0, group, this._from);
       }
     });
+  }
+
+  /**
+   * @returns {string}
+   */
+  getLanguage() {
+    return this._lang;
   }
 
   /**

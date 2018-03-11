@@ -1,7 +1,7 @@
 import {Roadmappy} from './Roadmappy';
 import {CanvasContextMenuPlugin} from "./plugin/CanvasContextMenuPlugin";
 import {ClickableTaskPlugin} from "./plugin/ClickableTaskPlugin";
-import {ClickableTaskLabelPlugin} from "./plugin/ClickableTaskLabelPlugin";
+import {ClickableTaskLabelPlugin} from "./plugin/ClickableTaskLable/ClickableTaskLabelPlugin";
 import {ClickableBarAreaPlugin} from "./plugin/ClickableBarAreaPlugin";
 import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
 

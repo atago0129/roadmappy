@@ -24,6 +24,7 @@
     "d3-v4-contextmenu": "git+https://github.com/atago0129/d3-v4-contextmenu.git#master",
     "get-form-data": "^1.2.5",
     "lodash.template": "^4.4.0",
-    "rgb-hex": "^2.1.0"
+    "rgb-hex": "^2.1.0",
+    "i18next": "^10.5.0 "
   }
 }

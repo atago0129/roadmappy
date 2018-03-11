@@ -1,0 +1,13 @@
+{
+  "Task name": "タスク名",
+  "Story": "ストーリー",
+  "Assignee": "担当者",
+  "Color": "バーの色",
+  "From": "タスク開始日",
+  "To": "タスク終了日",
+  "Save": "保存",
+  "Delete": "削除",
+  "Copy": "コピー",
+  "Cancel": "キャンセル",
+  "Applies to all tasks belonging to the same story(Apply when saving)": "同じストーリーに所属するタスクにも適用（保存時に適用されます）"
+}
