@@ -4,6 +4,7 @@ import translationJa from './locales/ja/translation';
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
 import './ClickableTaskLabelPlugin.css';
+import {AbstractRoadmapGroup} from "../../component/group/AbstractRoadmapGroup";
 
 export class ClickableTaskLabelPlugin extends PluginInterface {
 
@@ -203,7 +204,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
 
   _onClickAddGroupButton = e => {
     const type = e.target.getAttribute('data-group-type');
-    const groupName = window.prompt('enter ' + type + ' name');
+    const groupName = window.prompt(i18next.t('Enter ' + type + ' name'));
     if (groupName === '') return;
     this.roadmappy.roadmap.addNewGroup(groupName, type);
     this._initializeForm();
