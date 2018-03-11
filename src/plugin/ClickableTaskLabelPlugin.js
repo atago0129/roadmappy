@@ -72,6 +72,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
           <span>color</span>
           <input type="checkbox"<%= task.color !== null ? ' checked' : '' %> class="ClickableTaskLabelPlugin-form-color-checkbox">
           <input type="color" name="color" value="<%= task.color  %>" class="ClickableTaskLabelPlugin-form-color-input"<%= task.color === null ? ' disabled style="display:none"' : '' %>>
+          <div class="ClickableTaskLabelPlugin-form-color-all-story" style="display:none"> - <input type="checkbox" name="colorForAllStory"> Applies to all tasks belonging to the same story(Apply when saving)</div>
         </label>
       </div>
       <div>
@@ -128,10 +129,18 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
       case 'save': {
         const assoc = getFormData(this.form);
         assoc.id = parseInt(assoc.id, 10);
+        assoc.storyId = parseInt(assoc.storyId, 10);
         if (!assoc.hasOwnProperty('color')) assoc['color'] = null;
-        console.log(assoc);
+        if (!assoc.hasOwnProperty('colorForAllStory')) assoc['colorForAllStory'] = 'off';
         const task = this.roadmappy.roadmap.getTaskById(assoc.id);
         task.merge(assoc);
+        if (assoc['colorForAllStory'] === 'on') {
+          const story = this.roadmappy.roadmap.getStoryById(assoc.storyId);
+          this.roadmappy.roadmap.getTasksByGroup(story).map(function (task) {
+            task.color = assoc['color'];
+            return task;
+          });
+        }
         this.roadmappy.render();
         this.form.parentElement.removeChild(this.form);
         this.currentTask = null;
@@ -168,12 +177,15 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
    */
   _onClickColorSelect = e => {
     const colorInput = this.form.querySelector('.ClickableTaskLabelPlugin-form-color-input');
+    const colorAllGroup = this.form.querySelector('.ClickableTaskLabelPlugin-form-color-all-story');
     if (e.target.checked) {
       colorInput.style.display = '';
       colorInput.removeAttribute('disabled');
+      colorAllGroup.style.display = '';
     } else {
       colorInput.style.display = 'none';
       colorInput.setAttribute('disabled', 'true');
+      colorAllGroup.style.display = 'none';
     }
   };
 

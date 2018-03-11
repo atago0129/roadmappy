@@ -33,7 +33,7 @@ export class RoadmapTask {
   constructor(id, name, storyId, assigneeIds, color, order, from, to, involvement) {
     this.id = parseInt(id, 10);
     this.name = name;
-    this.storyId = storyId;
+    this.storyId = parseInt(storyId, 10);
     this.assigneeIds = [].concat(assigneeIds || []);
     this.color = color || null;
     this.order = parseInt(order);
