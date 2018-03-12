@@ -9,6 +9,7 @@ export class Roadmap {
 
   _lang = null;
   _type = null;
+  _taskSortRule = {};
   _from = null;
   _to = null;
   _tasks = [];
@@ -18,15 +19,17 @@ export class Roadmap {
   /**
    * @param {string} lang
    * @param {string} type
+   * @param {string[]} taskSortRule
    * @param {Date} baseDate
    * @param {array} span
    * @param {RoadmapTask[]} tasks
    * @param {RoadmapStory[]} stories
    * @param {RoadmapAssignee[]} assignees
    */
-  constructor(lang, type, baseDate, span, tasks, stories, assignees) {
+  constructor(lang, type, taskSortRule, baseDate, span, tasks, stories, assignees) {
     this._lang = lang;
     this._type = type || AbstractRoadmapGroup.TYPE.STORY;
+    this._taskSortRule = taskSortRule;
     this._tasks = this._tasks.concat(tasks || []);
     this._stories = this._stories.concat(stories || []);
     this._assignees = this._assignees.concat(assignees || []);
@@ -224,10 +227,18 @@ export class Roadmap {
       }
     });
     this._tasks.sort((a, b) => {
-      if (a.order !== b.order) {
-        return a.order > b.order ? 1 : -1;
+      const _a = a.toAssoc();
+      const _b = b.toAssoc();
+      if (_a.order !== _b.order) {
+        return _a.order > _b.order ? 1 : -1;
       } else {
-        return a.from > b.from ? 1 : -1;
+        for (let i = 0; i < this._taskSortRule.length; i++) {
+          if (!_a.hasOwnProperty(this._taskSortRule[i]) || !_b.hasOwnProperty(this._taskSortRule[i])) continue;
+          if (_a[this._taskSortRule[i]] !== _b[this._taskSortRule[i]]) {
+            return _a[this._taskSortRule[i]] > _b[this._taskSortRule[i]] ? 1 : -1;
+          }
+        }
+        return _a.id > _b.id ? 1 : -1;
       }
     });
   }
