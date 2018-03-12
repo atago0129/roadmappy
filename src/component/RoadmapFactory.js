@@ -14,6 +14,7 @@ export class RoadmapFactory {
     return new Roadmap(
       option.lang,
       option.type,
+      option.taskSortRule,
       option.baseDate,
       option.span,
       this._createTasks(dataSet.tasks || []),

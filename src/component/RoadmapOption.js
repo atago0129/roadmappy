@@ -4,6 +4,7 @@ import {RoadmapStyle} from './RoadmapStyle';
 export class RoadmapOption {
   lang;
   type;
+  taskSortRule;
   baseDate;
   span;
   targetElementId;
@@ -16,6 +17,7 @@ export class RoadmapOption {
   constructor(options) {
     this.lang = options.hasOwnProperty('lang') ? options.lang : 'en';
     this.type = AbstractRoadmapGroup.isValidType(options.type) ? options.type : AbstractRoadmapGroup.TYPE.STORY;
+    this.taskSortRule = options.hasOwnProperty('taskSortRule') ? options.taskSortRule.split(',') : ['from', 'name'];
     this.baseDate = new Date(options['baseDate'] || new Date());
     this.span = [].concat(options['span'] || [30, 30]);
     this.targetElementId = '#' + options.target;
