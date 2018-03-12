@@ -1,6 +1,6 @@
 import {PluginInterface} from "../PluginInterface";
 import i18next from 'i18next';
-import translationJa from './locales/ja/translation';
+import translation from './translation';
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
 import './ClickableTaskLabelPlugin.css';
@@ -20,14 +20,10 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     this.form.addEventListener('submit', this._onSubmit);
     this.form.addEventListener('click', this._onClick);
     roadmappy.on('click:task-label', this.toOnDoubleClick(this._onTaskLabelDoubleClick));
-    i18next
-      .init({
-        fallbackLng: this.roadmappy.roadmap.getLanguage(),
-        debug: true,
-        resources: {
-          ja: {translation: translationJa}
-        }
-      });
+  }
+
+  getTranslation() {
+    return translation;
   }
 
   /**

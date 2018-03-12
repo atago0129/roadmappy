@@ -40,4 +40,8 @@ export class PluginInterface {
       onClick(...args);
     };
   }
+
+  getTranslation() {
+    return {};
+  }
 }

@@ -3,6 +3,7 @@ import {RoadmapFactory} from './component/RoadmapFactory';
 import {RoadmapCanvas} from './component/RoadmapCanvas';
 import {RoadmapOption} from './component/RoadmapOption';
 import {PluginInterface} from "./plugin/PluginInterface";
+import i18next from 'i18next';
 
 export class Roadmappy extends EventEmitter {
 
@@ -33,8 +34,19 @@ export class Roadmappy extends EventEmitter {
     this.canvas.on('click:task-label', this.emit.bind(this, 'click:task-label'));
     this.canvas.on('click:bar-area', this.emit.bind(this, 'click:bar-area'));
     this.canvas.on('contextmenu:canvas', this.emit.bind(this, 'contextmenu:canvas'));
+
+    i18next.init({
+      fallbackLng: this.roadmap.getLanguage()
+    });
+
     option.plugins.forEach((plugin) => {
-      if (plugin instanceof PluginInterface) plugin.initialize(this);
+      if (!(plugin instanceof PluginInterface)) return;
+      const translation = plugin.getTranslation();
+      for (let lang in translation) {
+        if (!translation.hasOwnProperty(lang)) continue;
+        i18next.addResourceBundle(lang, 'translation', translation[lang], true, true);
+      }
+      plugin.initialize(this);
     });
   }
 
