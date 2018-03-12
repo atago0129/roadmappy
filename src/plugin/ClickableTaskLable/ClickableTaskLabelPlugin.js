@@ -204,8 +204,14 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
 
   _onClickAddGroupButton = e => {
     const type = e.target.getAttribute('data-group-type');
-    const groupName = window.prompt(i18next.t('Enter ' + type + ' name'));
-    if (groupName === '') return;
+    let message = '';
+    if (type === AbstractRoadmapGroup.TYPE.STORY) {
+      message = i18next.t('Enter story name');
+    } else {
+      message = i18next.t('Enter assignee name');
+    }
+    if (message === '') return;
+    const groupName = window.prompt(message);
     this.roadmappy.roadmap.addNewGroup(groupName, type);
     this._initializeForm();
   }
