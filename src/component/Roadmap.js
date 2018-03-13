@@ -229,17 +229,16 @@ export class Roadmap {
     this._tasks.sort((a, b) => {
       const _a = a.toAssoc();
       const _b = b.toAssoc();
+      for (let i = 0; i < this._taskSortRule.length; i++) {
+        if (!_a.hasOwnProperty(this._taskSortRule[i]) || !_b.hasOwnProperty(this._taskSortRule[i])) continue;
+        if (_a[this._taskSortRule[i]] !== _b[this._taskSortRule[i]]) {
+          return _a[this._taskSortRule[i]] > _b[this._taskSortRule[i]] ? 1 : -1;
+        }
+      }
       if (_a.order !== _b.order) {
         return _a.order > _b.order ? 1 : -1;
-      } else {
-        for (let i = 0; i < this._taskSortRule.length; i++) {
-          if (!_a.hasOwnProperty(this._taskSortRule[i]) || !_b.hasOwnProperty(this._taskSortRule[i])) continue;
-          if (_a[this._taskSortRule[i]] !== _b[this._taskSortRule[i]]) {
-            return _a[this._taskSortRule[i]] > _b[this._taskSortRule[i]] ? 1 : -1;
-          }
-        }
-        return _a.id > _b.id ? 1 : -1;
       }
+      return _a.id > _b.id ? 1 : -1;
     });
   }
 
