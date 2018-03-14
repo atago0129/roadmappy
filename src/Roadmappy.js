@@ -4,6 +4,9 @@ import {RoadmapCanvas} from './component/RoadmapCanvas';
 import {RoadmapOption} from './component/RoadmapOption';
 import {PluginInterface} from "./plugin/PluginInterface";
 import i18next from 'i18next';
+import {ContextMenuPluginInterface} from "./plugin/ContextMenuPluginInterface";
+import * as d3 from 'd3';
+import ContextMenu from 'd3-v4-contextmenu';
 
 export class Roadmappy extends EventEmitter {
 
@@ -36,9 +39,12 @@ export class Roadmappy extends EventEmitter {
     this.canvas.on('contextmenu:canvas', this.emit.bind(this, 'contextmenu:canvas'));
 
     i18next.init({
-      fallbackLng: this.roadmap.getLanguage()
+      fallbackLng: this.roadmap.getLanguage(),
+      nsSeparator: ':::',
+      keySeparator: '::'
     });
 
+    let contextMenus = [];
     option.plugins.forEach((plugin) => {
       if (!(plugin instanceof PluginInterface)) return;
       const translation = plugin.getTranslation();
@@ -47,7 +53,19 @@ export class Roadmappy extends EventEmitter {
         i18next.addResourceBundle(lang, 'translation', translation[lang], true, true);
       }
       plugin.initialize(this);
+      if (plugin instanceof ContextMenuPluginInterface) {
+        contextMenus.push(plugin);
+      }
     });
+
+    // init context menu
+    if (contextMenus.length > 0) {
+      const contextMenu = new ContextMenu(contextMenus);
+      this.canvas.on('contextmenu:canvas', (mousePos) => {
+        d3.event.preventDefault();
+        contextMenu.show(this.canvas.svg, mousePos[0], mousePos[1]);
+      });
+    }
   }
 
   /**
