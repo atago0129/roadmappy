@@ -1,5 +1,6 @@
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 import {RoadmapStyle} from './RoadmapStyle';
+import {CreateNewTaskPlugin, DraggableTaskPlugin, ExportJsonDataToClipboardPlugin, TaskEditFormPlugin} from "../";
 
 export class RoadmapOption {
   lang;
@@ -22,6 +23,12 @@ export class RoadmapOption {
     this.span = [].concat(options['span'] || [30, 30]);
     this.targetElementId = '#' + options.target;
     this.style = new RoadmapStyle(options.hasOwnProperty('style') ? options.style : {});
-    this.plugins = [].concat(options['plugins'] || []);
+    this.plugins = [].concat(options['plugins'] || [
+      // default plugins
+      new DraggableTaskPlugin(),
+      new TaskEditFormPlugin(),
+      new ExportJsonDataToClipboardPlugin(),
+      new CreateNewTaskPlugin()
+    ]);
   }
 }
