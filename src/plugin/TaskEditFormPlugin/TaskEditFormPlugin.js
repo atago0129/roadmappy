@@ -19,6 +19,7 @@ export class TaskEditFormPlugin extends PluginInterface {
     this.form.setAttribute('class', 'task-edit-form');
     this.form.addEventListener('submit', this._onSubmit);
     this.form.addEventListener('click', this._onClick);
+    roadmappy.on('click:task', this.toOnDoubleClick(this._showTaskEditForm));
     roadmappy.on('click:task-label', this.toOnDoubleClick(this._showTaskEditForm));
   }
 
