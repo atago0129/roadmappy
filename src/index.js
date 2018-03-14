@@ -3,6 +3,7 @@ import {ExportJsonDataToClipboardPlugin} from "./plugin/ContextMenuPlugin/Export
 import {TaskEditFormPlugin} from "./plugin/TaskEditFormPlugin/TaskEditFormPlugin";
 import {CreateNewTaskPlugin} from "./plugin/CreateNewTaskPlugin";
 import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
+import {TaskReorderPlugin} from "./plugin/ContextMenuPlugin/TaskReorderPlugin";
 
 if (document) {
   var scripts = document.getElementsByTagName('script');
@@ -18,3 +19,4 @@ export {ExportJsonDataToClipboardPlugin};
 export {TaskEditFormPlugin};
 export {CreateNewTaskPlugin};
 export {DraggableTaskPlugin};
+export {TaskReorderPlugin};

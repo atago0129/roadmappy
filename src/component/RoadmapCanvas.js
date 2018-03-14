@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import * as convertColor from 'rgb-hex';
 import {EventEmitter} from 'events';
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
+import {RoadmapStyle} from "./RoadmapStyle";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
@@ -367,12 +368,25 @@ export class RoadmapCanvas extends EventEmitter {
       .attr('ry', 2)
       .attr('stroke', 'none')
       .attr('fill-opacity', 0.5)
-      .on('click', (d) => this.emit('click:task', d));
-    enter.append('text')
+      .attr('cursor', 'move')
+      .on('click', (d) => {
+        const [x, y] = d3.mouse(this.element.node());
+        this.emit('click:task-label', d, d3.event.target, {x, y});
+      })
+      .call(
+        d3.drag()
+          .container(this.barArea.node())
+          .subject(() => d3.event.subject ? d3.event.subject : this.roadmap.getTasks()[this._invertYScale(d3.event.y)])
+          .on('start', (d) => this.emit('drag:start:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+          .on('drag', (d) => {
+            this._updateMouseDate(d3.mouse(this.barArea.node())[0], d3.mouse(this.barArea.node())[1]);
+            this.emit('drag:drag:task', d3.event.subject, {x: d3.event.x, y: d3.event.y});
+          })
+          .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
+      );
+    const taskLabel = enter.append('text')
       .attr('class', 'bar-label')
-      .attr('x', '50%')
       .attr('y', '50%')
-      .attr('text-anchor', 'middle')
       .attr('alignment-baseline', 'central')
       .attr('font-size', this.yScale.bandwidth() / 2)
       .attr('fill', '#000')
@@ -392,6 +406,24 @@ export class RoadmapCanvas extends EventEmitter {
           })
           .on('end', (d) => this.emit('drag:end:task', d3.event.subject, {x: d3.event.x, y: d3.event.y}))
       );
+    switch (this.style.taskLabelPosition) {
+      case RoadmapStyle.TASK_LABEL_POSITION_TYPE.LEFT:
+        taskLabel.attr('x', '15px').attr('text-anchor', 'start');
+        break;
+      case RoadmapStyle.TASK_LABEL_POSITION_TYPE.LEFT_OUTER:
+        taskLabel.attr('x', '-5').attr('text-anchor', 'end');
+        break;
+      case RoadmapStyle.TASK_LABEL_POSITION_TYPE.CENTER:
+        taskLabel.attr('x', '50%').attr('text-anchor', 'middle');
+        break;
+      case RoadmapStyle.TASK_LABEL_POSITION_TYPE.RIGHT:
+        taskLabel.attr('x', '100%').attr('transform', 'translate(-15, 0)').attr('text-anchor', 'end');
+        break;
+      case RoadmapStyle.TASK_LABEL_POSITION_TYPE.RIGHT_OUTER:
+        taskLabel.attr('x', '100%').attr('transform', 'translate(5, 0)').attr('text-anchor', 'start');
+        break;
+    }
+
     enter.append('text')
       .attr('class', 'bar-to-handle')
       .text('»')

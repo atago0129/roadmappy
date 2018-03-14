@@ -1,6 +1,6 @@
 import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
 import {RoadmapStyle} from './RoadmapStyle';
-import {CreateNewTaskPlugin, DraggableTaskPlugin, ExportJsonDataToClipboardPlugin, TaskEditFormPlugin} from "../";
+import {CreateNewTaskPlugin, DraggableTaskPlugin, ExportJsonDataToClipboardPlugin, TaskEditFormPlugin, TaskReorderPlugin} from "../";
 
 export class RoadmapOption {
   lang;
@@ -28,7 +28,8 @@ export class RoadmapOption {
       new DraggableTaskPlugin(),
       new TaskEditFormPlugin(),
       new ExportJsonDataToClipboardPlugin(),
-      new CreateNewTaskPlugin()
+      new CreateNewTaskPlugin(),
+      new TaskReorderPlugin()
     ]);
   }
 }
