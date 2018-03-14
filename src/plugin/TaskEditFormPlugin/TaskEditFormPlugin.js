@@ -3,10 +3,10 @@ import i18next from 'i18next';
 import translation from './translation';
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
-import './ClickableTaskLabelPlugin.css';
+import './TaskEditForm.css';
 import {AbstractRoadmapGroup} from "../../component/group/AbstractRoadmapGroup";
 
-export class ClickableTaskLabelPlugin extends PluginInterface {
+export class TaskEditFormPlugin extends PluginInterface {
 
   currentTask;
 
@@ -16,10 +16,10 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
   initialize(roadmappy) {
     this.roadmappy = roadmappy;
     this.form = document.createElement('form');
-    this.form.setAttribute('class', 'ClickableTaskLabelPlugin-form');
+    this.form.setAttribute('class', 'task-edit-form');
     this.form.addEventListener('submit', this._onSubmit);
     this.form.addEventListener('click', this._onClick);
-    roadmappy.on('click:task-label', this.toOnDoubleClick(this._onTaskLabelDoubleClick));
+    roadmappy.on('click:task-label', this.toOnDoubleClick(this._showTaskEditForm));
   }
 
   getTranslation() {
@@ -31,7 +31,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
    * @param {Selection} labelNode
    * @param {{x,y}} pos
    */
-  _onTaskLabelDoubleClick = (task, labelNode, pos) => {
+  _showTaskEditForm = (task, labelNode, pos) => {
     this.currentTask = task;
     this._initializeForm(pos);
   };
@@ -61,7 +61,7 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
             <% } %>
           </select>
         </label>
-        <span class="ClickableTaskLabelPlugin-form-add-group-button" data-group-type="story">+</span>
+        <span class="task-edit-form-add-group-button" data-group-type="story">+</span>
       </div>
       <div>
         <label>
@@ -72,14 +72,14 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
             <% } %>
           </select>
         </label>
-        <span class="ClickableTaskLabelPlugin-form-add-group-button" data-group-type="assignee">+</span>
+        <span class="task-edit-form-add-group-button" data-group-type="assignee">+</span>
       </div>
       <div>
         <label>
           <span><%= i18next.t('Color') %></span>
-          <input type="checkbox"<%= task.color !== null ? ' checked' : '' %> class="ClickableTaskLabelPlugin-form-color-checkbox">
-          <input type="color" name="color" value="<%= task.color  %>" class="ClickableTaskLabelPlugin-form-color-input"<%= task.color === null ? ' disabled style="display:none"' : '' %>>
-          <div class="ClickableTaskLabelPlugin-form-color-all-story" style="display:none"> - <input type="checkbox" name="colorForAllStory"> <%= i18next.t('Applies to all tasks belonging to the same story(Apply when saving)') %></div>
+          <input type="checkbox"<%= task.color !== null ? ' checked' : '' %> class="task-edit-form-color-checkbox">
+          <input type="color" name="color" value="<%= task.color  %>" class="task-edit-form-color-input"<%= task.color === null ? ' disabled style="display:none"' : '' %>>
+          <div class="task-edit-form-color-all-story" style="display:none"> - <input type="checkbox" name="colorForAllStory"> <%= i18next.t('Applies to all tasks belonging to the same story(Apply when saving)') %></div>
         </label>
       </div>
       <div>
@@ -116,10 +116,10 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
 
     this.roadmappy.canvas.element.node().appendChild(this.form);
 
-    this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox').removeEventListener('click', this._onClickColorSelect);
-    this.form.querySelector('.ClickableTaskLabelPlugin-form-color-checkbox').addEventListener('click', this._onClickColorSelect);
-    this.form.querySelectorAll('.ClickableTaskLabelPlugin-form-add-group-button').forEach((elm) => elm.removeEventListener('click', this._onClickAddGroupButton));
-    this.form.querySelectorAll('.ClickableTaskLabelPlugin-form-add-group-button').forEach((elm) => elm.addEventListener('click', this._onClickAddGroupButton));
+    this.form.querySelector('.task-edit-form-color-checkbox').removeEventListener('click', this._onClickColorSelect);
+    this.form.querySelector('.task-edit-form-color-checkbox').addEventListener('click', this._onClickColorSelect);
+    this.form.querySelectorAll('.task-edit-form-add-group-button').forEach((elm) => elm.removeEventListener('click', this._onClickAddGroupButton));
+    this.form.querySelectorAll('.task-edit-form-add-group-button').forEach((elm) => elm.addEventListener('click', this._onClickAddGroupButton));
   }
 
   /**
@@ -185,8 +185,8 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
    * @param {Event} e
    */
   _onClickColorSelect = e => {
-    const colorInput = this.form.querySelector('.ClickableTaskLabelPlugin-form-color-input');
-    const colorAllGroup = this.form.querySelector('.ClickableTaskLabelPlugin-form-color-all-story');
+    const colorInput = this.form.querySelector('.task-edit-form-color-input');
+    const colorAllGroup = this.form.querySelector('.task-edit-form-color-all-story');
     if (e.target.checked) {
       colorInput.style.display = '';
       colorInput.removeAttribute('disabled');
@@ -202,9 +202,9 @@ export class ClickableTaskLabelPlugin extends PluginInterface {
     const type = e.target.getAttribute('data-group-type');
     let message = '';
     if (type === AbstractRoadmapGroup.TYPE.STORY) {
-      message = i18next.t('Enter story name');
+      message = i18next.t('Enter story name.');
     } else {
-      message = i18next.t('Enter assignee name');
+      message = i18next.t('Enter assignee name.');
     }
     if (message === '') return;
     const groupName = window.prompt(message);

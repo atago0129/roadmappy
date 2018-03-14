@@ -1,8 +1,7 @@
 import {Roadmappy} from './Roadmappy';
-import {CanvasContextMenuPlugin} from "./plugin/CanvasContextMenuPlugin";
-import {ClickableTaskPlugin} from "./plugin/ClickableTaskPlugin";
-import {ClickableTaskLabelPlugin} from "./plugin/ClickableTaskLable/ClickableTaskLabelPlugin";
-import {ClickableBarAreaPlugin} from "./plugin/ClickableBarAreaPlugin";
+import {ExportJsonDataToClipboardPlugin} from "./plugin/ExportJsonDataToClipboardPlugin";
+import {TaskEditFormPlugin} from "./plugin/TaskEditFormPlugin/TaskEditFormPlugin";
+import {CreateNewTaskPlugin} from "./plugin/CreateNewTaskPlugin";
 import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
 
 if (document) {
@@ -15,8 +14,7 @@ if (document) {
 
 export default Roadmappy;
 
-export {CanvasContextMenuPlugin};
-export {ClickableTaskPlugin};
-export {ClickableTaskLabelPlugin};
-export {ClickableBarAreaPlugin};
+export {ExportJsonDataToClipboardPlugin};
+export {TaskEditFormPlugin};
+export {CreateNewTaskPlugin};
 export {DraggableTaskPlugin};

@@ -41,6 +41,9 @@ export class PluginInterface {
     };
   }
 
+  /**
+   * @returns {{}}
+   */
   getTranslation() {
     return {};
   }
