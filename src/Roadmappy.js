@@ -44,7 +44,7 @@ export class Roadmappy extends EventEmitter {
       keySeparator: '::'
     });
 
-    let contextMenus = [];
+    const contextMenus = [];
     option.plugins.forEach((plugin) => {
       if (!(plugin instanceof PluginInterface)) return;
       const translation = plugin.getTranslation();
