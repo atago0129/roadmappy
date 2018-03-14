@@ -4,7 +4,7 @@ import {RoadmapCanvas} from './component/RoadmapCanvas';
 import {RoadmapOption} from './component/RoadmapOption';
 import {PluginInterface} from "./plugin/PluginInterface";
 import i18next from 'i18next';
-import {ContextMenuPluginInterface} from "./plugin/ContextMenuPluginInterface";
+import {ContextMenuPluginInterface} from "./plugin/ContextMenuPlugin/ContextMenuPluginInterface";
 import * as d3 from 'd3';
 import ContextMenu from 'd3-v4-contextmenu';
 

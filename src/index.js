@@ -1,5 +1,5 @@
 import {Roadmappy} from './Roadmappy';
-import {ExportJsonDataToClipboardPlugin} from "./plugin/ExportJsonDataToClipboardPlugin";
+import {ExportJsonDataToClipboardPlugin} from "./plugin/ContextMenuPlugin/ExportJsonDataToClipboardPlugin";
 import {TaskEditFormPlugin} from "./plugin/TaskEditFormPlugin/TaskEditFormPlugin";
 import {CreateNewTaskPlugin} from "./plugin/CreateNewTaskPlugin";
 import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
