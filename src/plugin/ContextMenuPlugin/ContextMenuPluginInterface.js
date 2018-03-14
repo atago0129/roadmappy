@@ -1,4 +1,4 @@
-import {PluginInterface} from "./PluginInterface";
+import {PluginInterface} from "../PluginInterface";
 
 export class ContextMenuPluginInterface extends PluginInterface {
 
