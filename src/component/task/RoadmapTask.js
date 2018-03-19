@@ -8,6 +8,7 @@ export class RoadmapTask {
   color;
   order;
   involvement;
+  selected = false;
 
   /**
    * @private
@@ -104,7 +105,8 @@ export class RoadmapTask {
       color: this.color,
       storyId: this.storyId,
       assigneeIds: this.assigneeIds,
-      involvement: this.involvement
+      involvement: this.involvement,
+      selected: this.selected
     };
   }
 
