@@ -116,6 +116,13 @@ export class Roadmap {
   }
 
   /**
+   * @return {RoadmapTask[]}
+   */
+  getSelectedTasks() {
+    return this.getTasks().filter(task => task.selected);
+  }
+
+  /**
    * @param {AbstractRoadmapGroup} group
    * @returns {RoadmapTask[]}
    */
