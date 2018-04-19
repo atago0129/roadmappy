@@ -1,27 +1,31 @@
-import { ContextMenuPluginInterface } from './ContextMenuPluginInterface';
-import i18next from 'i18next';
+import i18next from "i18next";
+import { TaskReorderItem } from "./TaskReorderPluginItem";
+import { ContextMenuItemInterface } from "./ContextMenuItemInterface";
 
-export class TaskReorderPlugin extends ContextMenuPluginInterface {
-  /**
-   * @param {Roadmappy} roadmappy
-   */
-  initialize(roadmappy) {
-    this.roadmappy = roadmappy;
-  }
+export class TaskReorderPlugin extends ContextMenuItemInterface {
 
-  label() {
+  label = () => {
     return i18next.t('reorder task');
-  }
+  };
 
-  cb() {
+  onClick = () => {
     this.roadmappy.roadmap.reorder();
     this.roadmappy.render();
-  }
+  };
+
+  items = () => {
+    return [
+      new TaskReorderItem(this.roadmappy, i18next.t('From'), ['from', 'name']),
+      new TaskReorderItem(this.roadmappy, i18next.t('To'), ['to', 'name']),
+      new TaskReorderItem(this.roadmappy, i18next.t('Task name'), ['name']),
+      new TaskReorderItem(this.roadmappy, i18next.t('Story'), ['storyId', 'from', 'name'])
+    ];
+  };
 
   getTranslation() {
     return {
       ja: {
-        'reorder task': 'タスクをソートし直し'
+        'reorder task': 'タスクソート'
       }
     };
   }

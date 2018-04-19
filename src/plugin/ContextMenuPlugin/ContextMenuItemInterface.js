@@ -1,10 +1,8 @@
-import { PluginInterface } from '../PluginInterface';
+export class ContextMenuItemInterface {
 
-export class ContextMenuPluginInterface extends PluginInterface {
-  /**
-   * @param {Roadmappy} roadmappy
-   */
-  initialize(roadmappy) {
+  roadmappy;
+
+  initilize(roadmappy) {
     this.roadmappy = roadmappy;
   }
 
@@ -30,4 +28,3 @@ export class ContextMenuPluginInterface extends PluginInterface {
    */
   items = null;
 }
-

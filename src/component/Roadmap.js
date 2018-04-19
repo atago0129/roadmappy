@@ -258,8 +258,10 @@ export class Roadmap {
 
   /**
    * reorder.
+   * @param {string[]|null} sortRule
    */
-  reorder() {
+  reorder(sortRule = null) {
+    sortRule = (sortRule === null) ? this._taskSortRule : sortRule;
     this._assignees.sort((a, b) => {
       if (a.order !== b.order) {
         return a.order > b.order ? 1 : -1;
@@ -277,10 +279,10 @@ export class Roadmap {
     this._tasks.sort((a, b) => {
       const _a = a.toAssoc();
       const _b = b.toAssoc();
-      for (let i = 0; i < this._taskSortRule.length; i++) {
-        if (!_a.hasOwnProperty(this._taskSortRule[i]) || !_b.hasOwnProperty(this._taskSortRule[i])) continue;
-        if (_a[this._taskSortRule[i]] !== _b[this._taskSortRule[i]]) {
-          return _a[this._taskSortRule[i]] > _b[this._taskSortRule[i]] ? 1 : -1;
+      for (let i = 0; i < sortRule.length; i++) {
+        if (!_a.hasOwnProperty(sortRule[i]) || !_b.hasOwnProperty(sortRule[i])) continue;
+        if (_a[sortRule[i]] !== _b[sortRule[i]]) {
+          return _a[sortRule[i]] > _b[sortRule[i]] ? 1 : -1;
         }
       }
       if (_a.order !== _b.order) {

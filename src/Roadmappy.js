@@ -5,8 +5,7 @@ import { RoadmapOption } from './component/RoadmapOption';
 import { PluginInterface } from './plugin/PluginInterface';
 import i18next from 'i18next';
 import { ContextMenuPluginInterface } from './plugin/ContextMenuPlugin/ContextMenuPluginInterface';
-import * as d3 from 'd3';
-import ContextMenu from 'd3-v4-contextmenu';
+import { contextmenu } from '@atago0129/d3-v4-contextmenu';
 
 export class Roadmappy extends EventEmitter {
   roadmap;
@@ -59,11 +58,7 @@ export class Roadmappy extends EventEmitter {
 
     // init context menu
     if (contextMenus.length > 0) {
-      const contextMenu = new ContextMenu(contextMenus);
-      this.canvas.on('contextmenu:canvas', mousePos => {
-        d3.event.preventDefault();
-        contextMenu.show(this.canvas.svg, mousePos[0], mousePos[1]);
-      });
+      this.canvas.on('contextmenu:canvas', contextmenu(contextMenus));
     }
   }
 
