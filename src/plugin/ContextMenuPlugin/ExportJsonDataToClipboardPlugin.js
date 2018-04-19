@@ -2,18 +2,12 @@ import { ContextMenuPluginInterface } from './ContextMenuPluginInterface';
 import i18next from 'i18next';
 
 export class ExportJsonDataToClipboardPlugin extends ContextMenuPluginInterface {
-  /**
-   * @param {Roadmappy} roadmappy
-   */
-  initialize(roadmappy) {
-    this.roadmappy = roadmappy;
-  }
 
-  label() {
+  label = () => {
     return i18next.t('export json data to clipboard.');
-  }
+  };
 
-  cb() {
+  onClick = () => {
     const dummy = document.createElement('textarea');
     document.body.appendChild(dummy);
     dummy.setAttribute('id', 'copy-dummy');
@@ -21,7 +15,7 @@ export class ExportJsonDataToClipboardPlugin extends ContextMenuPluginInterface 
     dummy.select();
     document.execCommand('copy');
     document.body.removeChild(dummy);
-  }
+  };
 
   getTranslation() {
     return {
