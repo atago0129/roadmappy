@@ -1,5 +1,5 @@
-import {ContextMenuPluginInterface} from "./ContextMenuPluginInterface";
-import i18next from "i18next";
+import { ContextMenuPluginInterface } from './ContextMenuPluginInterface';
+import i18next from 'i18next';
 
 export class TaskReorderPlugin extends ContextMenuPluginInterface {
   /**
@@ -23,6 +23,6 @@ export class TaskReorderPlugin extends ContextMenuPluginInterface {
       ja: {
         'reorder task': 'タスクをソートし直し'
       }
-    }
+    };
   }
 }

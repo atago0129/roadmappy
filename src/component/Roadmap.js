@@ -1,12 +1,11 @@
-import {AbstractRoadmapGroup} from './group/AbstractRoadmapGroup';
-import {RoadmapTask} from "./task/RoadmapTask";
-import {RoadmapStory} from "./group/RoadmapStory";
-import {RoadmapAssignee} from "./group/RoadmapAssignee";
+import { AbstractRoadmapGroup } from './group/AbstractRoadmapGroup';
+import { RoadmapTask } from './task/RoadmapTask';
+import { RoadmapStory } from './group/RoadmapStory';
+import { RoadmapAssignee } from './group/RoadmapAssignee';
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 
 export class Roadmap {
-
   _lang = null;
   _type = null;
   _taskSortRule = {};
@@ -65,9 +64,13 @@ export class Roadmap {
    * @returns {RoadmapStory|null}
    */
   getStoryById(id) {
-    return this._stories.filter(function(story) {
-      return story.id === id;
-    }).pop() || null;
+    return (
+      this._stories
+        .filter(function(story) {
+          return story.id === id;
+        })
+        .pop() || null
+    );
   }
 
   /**
@@ -75,9 +78,13 @@ export class Roadmap {
    * @returns {RoadmapAssignee|null}
    */
   getAssigneeById(id) {
-    return this._assignees.filter(function(asignee) {
-      return asignee.id === id;
-    }).pop() || null;
+    return (
+      this._assignees
+        .filter(function(asignee) {
+          return asignee.id === id;
+        })
+        .pop() || null
+    );
   }
 
   /**
@@ -85,9 +92,13 @@ export class Roadmap {
    * @return {RoadmapTask}
    */
   getTaskById(id) {
-    return this._tasks.filter(function(task) {
-      return task.id === id;
-    }).pop() || null;
+    return (
+      this._tasks
+        .filter(function(task) {
+          return task.id === id;
+        })
+        .pop() || null
+    );
   }
 
   /**
@@ -174,10 +185,30 @@ export class Roadmap {
     let newTask;
     switch (group.type) {
       case AbstractRoadmapGroup.TYPE.STORY:
-        newTask = new RoadmapTask(taskId, 'new task', group.id, null, null, 0, from, new Date(from.getTime() + 7 * ONE_DAY), 100);
+        newTask = new RoadmapTask(
+          taskId,
+          'new task',
+          group.id,
+          null,
+          null,
+          0,
+          from,
+          new Date(from.getTime() + 7 * ONE_DAY),
+          100
+        );
         break;
       case AbstractRoadmapGroup.TYPE.ASSIGNEE:
-        newTask = new RoadmapTask(taskId, 'new task', null, group.id, null, 0, from, new Date(from.getTime() + 7 * ONE_DAY), 100);
+        newTask = new RoadmapTask(
+          taskId,
+          'new task',
+          null,
+          group.id,
+          null,
+          0,
+          from,
+          new Date(from.getTime() + 7 * ONE_DAY),
+          100
+        );
         break;
       default:
         throw new Error('invalid argument.');
@@ -191,7 +222,17 @@ export class Roadmap {
   copyTask(taskId) {
     const targetTask = this.getTaskById(taskId);
     const newTaskId = Math.max.apply(null, [0].concat(this._tasks.map(t => t.id))) + 1;
-    const newTask = new RoadmapTask(newTaskId, '[copy]' + targetTask.name, targetTask.storyId, targetTask.assigneeIds, targetTask.color, targetTask.order, targetTask.from, targetTask.to, targetTask.involvement);
+    const newTask = new RoadmapTask(
+      newTaskId,
+      '[copy]' + targetTask.name,
+      targetTask.storyId,
+      targetTask.assigneeIds,
+      targetTask.color,
+      targetTask.order,
+      targetTask.from,
+      targetTask.to,
+      targetTask.involvement
+    );
     this._tasks.push(newTask);
   }
 
@@ -275,7 +316,7 @@ export class Roadmap {
    * @param {Date}
    */
   set from(from) {
-    if ((from.getTime() - this.to.getTime()) > -ONE_DAY) {
+    if (from.getTime() - this.to.getTime() > -ONE_DAY) {
       this._to = new Date(from.getTime() + ONE_DAY);
     }
     this._from = from;
@@ -285,7 +326,7 @@ export class Roadmap {
    * @param {Date}
    */
   set to(to) {
-    if ((this.from.getTime() - to.getTime()) > -ONE_DAY) {
+    if (this.from.getTime() - to.getTime() > -ONE_DAY) {
       this._from = new Date(to.getTime() - ONE_DAY);
     }
     this._to = to;
@@ -301,5 +342,4 @@ export class Roadmap {
       assignees: this._assignees.map(a => a.toAssoc())
     };
   }
-
 }

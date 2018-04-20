@@ -1,9 +1,9 @@
-import {Roadmappy} from './Roadmappy';
-import {ExportJsonDataToClipboardPlugin} from "./plugin/ContextMenuPlugin/ExportJsonDataToClipboardPlugin";
-import {TaskEditFormPlugin} from "./plugin/TaskEditFormPlugin/TaskEditFormPlugin";
-import {CreateNewTaskPlugin} from "./plugin/CreateNewTaskPlugin";
-import {DraggableTaskPlugin} from "./plugin/DraggableTaskPlugin";
-import {TaskReorderPlugin} from "./plugin/ContextMenuPlugin/TaskReorderPlugin";
+import { Roadmappy } from './Roadmappy';
+import { ExportJsonDataToClipboardPlugin } from './plugin/ContextMenuPlugin/ExportJsonDataToClipboardPlugin';
+import { TaskEditFormPlugin } from './plugin/TaskEditFormPlugin/TaskEditFormPlugin';
+import { CreateNewTaskPlugin } from './plugin/CreateNewTaskPlugin';
+import { DraggableTaskPlugin } from './plugin/DraggableTaskPlugin';
+import { TaskReorderPlugin } from './plugin/ContextMenuPlugin/TaskReorderPlugin';
 
 if (document) {
   var scripts = document.getElementsByTagName('script');
@@ -15,8 +15,8 @@ if (document) {
 
 export default Roadmappy;
 
-export {ExportJsonDataToClipboardPlugin};
-export {TaskEditFormPlugin};
-export {CreateNewTaskPlugin};
-export {DraggableTaskPlugin};
-export {TaskReorderPlugin};
+export { ExportJsonDataToClipboardPlugin };
+export { TaskEditFormPlugin };
+export { CreateNewTaskPlugin };
+export { DraggableTaskPlugin };
+export { TaskReorderPlugin };

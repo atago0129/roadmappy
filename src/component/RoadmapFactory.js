@@ -1,10 +1,9 @@
-import {Roadmap} from './Roadmap';
-import {RoadmapTask} from './task/RoadmapTask';
-import {RoadmapStory} from './group/RoadmapStory';
-import {RoadmapAssignee} from './group/RoadmapAssignee';
+import { Roadmap } from './Roadmap';
+import { RoadmapTask } from './task/RoadmapTask';
+import { RoadmapStory } from './group/RoadmapStory';
+import { RoadmapAssignee } from './group/RoadmapAssignee';
 
 export class RoadmapFactory {
-
   /**
    * @param {RoadmapOption} option
    * @param {object} dataSet
@@ -29,15 +28,13 @@ export class RoadmapFactory {
    * @private
    */
   _createStories(stories) {
-    return stories.filter((story) => {
-      return story.id && story.name;
-    }).map((story) => {
-      return new RoadmapStory(
-        story.id,
-        story.name,
-        story.order || 0
-      );
-    });
+    return stories
+      .filter(story => {
+        return story.id && story.name;
+      })
+      .map(story => {
+        return new RoadmapStory(story.id, story.name, story.order || 0);
+      });
   }
 
   /**
@@ -46,15 +43,13 @@ export class RoadmapFactory {
    * @private
    */
   _createAssignees(assignees) {
-    return assignees.filter((assignee) => {
-      return assignee.id && assignee.name;
-    }).map((assignee) => {
-      return new RoadmapAssignee(
-        assignee.id,
-        assignee.name,
-        assignee.order || 0
-      );
-    });
+    return assignees
+      .filter(assignee => {
+        return assignee.id && assignee.name;
+      })
+      .map(assignee => {
+        return new RoadmapAssignee(assignee.id, assignee.name, assignee.order || 0);
+      });
   }
 
   /**
@@ -63,21 +58,22 @@ export class RoadmapFactory {
    * @private
    */
   _createTasks(tasks) {
-    return tasks.filter((task) => {
-      return task.id && task.name && task.from && task.to;
-    }).map((task) => {
-      return new RoadmapTask(
-        task.id,
-        task.name,
-        task.storyId || null,
-        task.assigneeIds || [],
-        task.color || null,
-        task.order || 0,
-        task.from,
-        task.to,
-        task.involvement || 0
-      );
-    });
+    return tasks
+      .filter(task => {
+        return task.id && task.name && task.from && task.to;
+      })
+      .map(task => {
+        return new RoadmapTask(
+          task.id,
+          task.name,
+          task.storyId || null,
+          task.assigneeIds || [],
+          task.color || null,
+          task.order || 0,
+          task.from,
+          task.to,
+          task.involvement || 0
+        );
+      });
   }
-
 }

@@ -55,7 +55,7 @@ export class RoadmapTask {
 
   set from(from) {
     from = this._fixDate(from);
-    if ((from.getTime() - this.to.getTime()) > -ONE_DAY) {
+    if (from.getTime() - this.to.getTime() > -ONE_DAY) {
       this._to = new Date(from.getTime() + ONE_DAY);
     }
     this._from = from;
@@ -63,14 +63,14 @@ export class RoadmapTask {
 
   set to(to) {
     to = this._fixDate(to);
-    if ((this.from.getTime() - to.getTime()) > -ONE_DAY) {
+    if (this.from.getTime() - to.getTime() > -ONE_DAY) {
       this._from = new Date(to.getTime() - ONE_DAY);
     }
     this._to = to;
   }
 
   _fixDate(date) {
-    return new Date(date.getTime() - (date.getTime() % ONE_DAY));
+    return new Date(date.getTime() - date.getTime() % ONE_DAY);
   }
 
   /**
@@ -80,7 +80,7 @@ export class RoadmapTask {
     for (const name in assoc) {
       switch (name) {
         case 'assigneeIds':
-          this[name] = [].concat(assoc[name] || []).map((id) => parseInt(id, 10));
+          this[name] = [].concat(assoc[name] || []).map(id => parseInt(id, 10));
           break;
         case 'from':
         case 'to':
@@ -100,8 +100,16 @@ export class RoadmapTask {
     return {
       id: this.id,
       name: this.name,
-      from: [this._from.getFullYear(), ('0' + (this._from.getMonth() + 1)).slice(-2), ('0' + this._from.getDate()).slice(-2)].join('-'),
-      to: [this._to.getFullYear(), ('0' + (this._to.getMonth() + 1)).slice(-2), ('0' + this._to.getDate()).slice(-2)].join('-'),
+      from: [
+        this._from.getFullYear(),
+        ('0' + (this._from.getMonth() + 1)).slice(-2),
+        ('0' + this._from.getDate()).slice(-2)
+      ].join('-'),
+      to: [
+        this._to.getFullYear(),
+        ('0' + (this._to.getMonth() + 1)).slice(-2),
+        ('0' + this._to.getDate()).slice(-2)
+      ].join('-'),
       color: this.color,
       storyId: this.storyId,
       assigneeIds: this.assigneeIds,
@@ -109,6 +117,4 @@ export class RoadmapTask {
       selected: this.selected
     };
   }
-
 }
-

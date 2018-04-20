@@ -1,15 +1,14 @@
-import {EventEmitter} from 'events';
-import {RoadmapFactory} from './component/RoadmapFactory';
-import {RoadmapCanvas} from './component/RoadmapCanvas';
-import {RoadmapOption} from './component/RoadmapOption';
-import {PluginInterface} from "./plugin/PluginInterface";
+import { EventEmitter } from 'events';
+import { RoadmapFactory } from './component/RoadmapFactory';
+import { RoadmapCanvas } from './component/RoadmapCanvas';
+import { RoadmapOption } from './component/RoadmapOption';
+import { PluginInterface } from './plugin/PluginInterface';
 import i18next from 'i18next';
-import {ContextMenuPluginInterface} from "./plugin/ContextMenuPlugin/ContextMenuPluginInterface";
+import { ContextMenuPluginInterface } from './plugin/ContextMenuPlugin/ContextMenuPluginInterface';
 import * as d3 from 'd3';
 import ContextMenu from 'd3-v4-contextmenu';
 
 export class Roadmappy extends EventEmitter {
-
   roadmap;
 
   canvas;
@@ -45,7 +44,7 @@ export class Roadmappy extends EventEmitter {
     });
 
     const contextMenus = [];
-    option.plugins.forEach((plugin) => {
+    option.plugins.forEach(plugin => {
       if (!(plugin instanceof PluginInterface)) return;
       const translation = plugin.getTranslation();
       for (let lang in translation) {
@@ -61,7 +60,7 @@ export class Roadmappy extends EventEmitter {
     // init context menu
     if (contextMenus.length > 0) {
       const contextMenu = new ContextMenu(contextMenus);
-      this.canvas.on('contextmenu:canvas', (mousePos) => {
+      this.canvas.on('contextmenu:canvas', mousePos => {
         d3.event.preventDefault();
         contextMenu.show(this.canvas.svg, mousePos[0], mousePos[1]);
       });
@@ -74,5 +73,4 @@ export class Roadmappy extends EventEmitter {
   render() {
     this.canvas.render();
   }
-
 }

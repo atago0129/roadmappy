@@ -1,4 +1,4 @@
-import {AbstractRoadmapGroup} from './AbstractRoadmapGroup';
+import { AbstractRoadmapGroup } from './AbstractRoadmapGroup';
 
 export class RoadmapAssignee extends AbstractRoadmapGroup {
   /**
@@ -17,6 +17,4 @@ export class RoadmapAssignee extends AbstractRoadmapGroup {
   match(task) {
     return task.assigneeIds.indexOf(this.id) >= 0;
   }
-
 }
-
