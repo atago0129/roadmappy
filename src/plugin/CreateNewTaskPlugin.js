@@ -1,7 +1,6 @@
-import {PluginInterface} from "./PluginInterface";
+import { PluginInterface } from './PluginInterface';
 
 export class CreateNewTaskPlugin extends PluginInterface {
-
   /**
    * @param {Roadmappy} roadmappy
    */
@@ -17,6 +16,5 @@ export class CreateNewTaskPlugin extends PluginInterface {
       xIndex
     );
     this.roadmappy.render();
-  }
-
+  };
 }

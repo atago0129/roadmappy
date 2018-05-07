@@ -1,7 +1,6 @@
-import {PluginInterface} from "../PluginInterface";
+import { PluginInterface } from '../PluginInterface';
 
 export class ContextMenuPluginInterface extends PluginInterface {
-
   /**
    * Define context menu label
    * @returns string

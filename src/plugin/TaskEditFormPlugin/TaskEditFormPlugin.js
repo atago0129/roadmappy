@@ -1,13 +1,12 @@
-import {PluginInterface} from "../PluginInterface";
+import { PluginInterface } from '../PluginInterface';
 import i18next from 'i18next';
 import translation from './translation';
 import template from 'lodash.template';
 import getFormData from 'get-form-data';
 import './TaskEditForm.css';
-import {AbstractRoadmapGroup} from "../../component/group/AbstractRoadmapGroup";
+import { AbstractRoadmapGroup } from '../../component/group/AbstractRoadmapGroup';
 
 export class TaskEditFormPlugin extends PluginInterface {
-
   currentTask;
 
   /**
@@ -111,7 +110,6 @@ export class TaskEditFormPlugin extends PluginInterface {
       i18next: i18next
     });
 
-
     this.form.style.left = `${pos.x}px`;
     this.form.style.top = `${pos.y}px`;
 
@@ -119,8 +117,12 @@ export class TaskEditFormPlugin extends PluginInterface {
 
     this.form.querySelector('.task-edit-form-color-checkbox').removeEventListener('click', this._onClickColorSelect);
     this.form.querySelector('.task-edit-form-color-checkbox').addEventListener('click', this._onClickColorSelect);
-    this.form.querySelectorAll('.task-edit-form-add-group-button').forEach((elm) => elm.removeEventListener('click', this._onClickAddGroupButton));
-    this.form.querySelectorAll('.task-edit-form-add-group-button').forEach((elm) => elm.addEventListener('click', this._onClickAddGroupButton));
+    this.form
+      .querySelectorAll('.task-edit-form-add-group-button')
+      .forEach(elm => elm.removeEventListener('click', this._onClickAddGroupButton));
+    this.form
+      .querySelectorAll('.task-edit-form-add-group-button')
+      .forEach(elm => elm.addEventListener('click', this._onClickAddGroupButton));
   }
 
   /**
@@ -146,7 +148,7 @@ export class TaskEditFormPlugin extends PluginInterface {
         task.merge(assoc);
         if (assoc['colorForAllStory'] === 'on') {
           const story = this.roadmappy.roadmap.getStoryById(assoc.storyId);
-          this.roadmappy.roadmap.getTasksByGroup(story).map(function (task) {
+          this.roadmappy.roadmap.getTasksByGroup(story).map(function(task) {
             task.color = assoc['color'];
             return task;
           });
@@ -211,6 +213,5 @@ export class TaskEditFormPlugin extends PluginInterface {
     const groupName = window.prompt(message);
     this.roadmappy.roadmap.addNewGroup(groupName, type);
     this._initializeForm();
-  }
-
+  };
 }

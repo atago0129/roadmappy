@@ -1,10 +1,9 @@
-import {PluginInterface} from "./PluginInterface";
+import { PluginInterface } from './PluginInterface';
 import * as d3 from 'd3';
 
 const DRAG_THRESHOLD_PIXEL = 10;
 
 export class DraggableTaskPlugin extends PluginInterface {
-
   isDragging = false;
   dragStartPos = null;
 
@@ -39,14 +38,14 @@ export class DraggableTaskPlugin extends PluginInterface {
   }
 
   _unselect() {
-    this.roadmappy.roadmap.getSelectedTasks().forEach(task => task.selected = false);
+    this.roadmappy.roadmap.getSelectedTasks().forEach(task => (task.selected = false));
     this.roadmappy.render();
   }
 
   _startDrag(task, pos) {
     this.dragStartPos = pos;
     this.taskPosMap = [task].concat(this.roadmappy.roadmap.getSelectedTasks()).reduce((tasks, task) => {
-      tasks[task.id] = {from: task.from, to: task.to};
+      tasks[task.id] = { from: task.from, to: task.to };
       return tasks;
     }, {});
   }
@@ -82,11 +81,10 @@ export class DraggableTaskPlugin extends PluginInterface {
   _endDrag(task, pos) {
     if (this.isDragging) {
       this.dragStartPos = null;
-      this.taskPosMap = {}
-      this.roadmappy.roadmap.getSelectedTasks().forEach(task => task.selected = false);
+      this.taskPosMap = {};
+      this.roadmappy.roadmap.getSelectedTasks().forEach(task => (task.selected = false));
       this.isDragging = false;
     }
     this.roadmappy.render();
   }
-
 }

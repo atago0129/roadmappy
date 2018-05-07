@@ -1,4 +1,4 @@
-import {ContextMenuPluginInterface} from "./ContextMenuPluginInterface";
+import { ContextMenuPluginInterface } from './ContextMenuPluginInterface';
 import i18next from 'i18next';
 
 export class ExportJsonDataToClipboardPlugin extends ContextMenuPluginInterface {
@@ -28,6 +28,6 @@ export class ExportJsonDataToClipboardPlugin extends ContextMenuPluginInterface 
       ja: {
         'export json data to clipboard.': 'JSON データをクリップボードへコピー'
       }
-    }
+    };
   }
 }

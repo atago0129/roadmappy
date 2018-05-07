@@ -1,5 +1,4 @@
 export class AbstractRoadmapGroup {
-
   static TYPE = {
     STORY: 'story',
     ASSIGNEE: 'assignee'
@@ -31,7 +30,6 @@ export class AbstractRoadmapGroup {
     this.order = order;
   }
 
-
   /**
    * @param {RoadmapTask} task
    * @return {boolean}
@@ -48,7 +46,6 @@ export class AbstractRoadmapGroup {
       id: this.id,
       name: this.name,
       order: this.order
-    }
+    };
   }
 }
-
