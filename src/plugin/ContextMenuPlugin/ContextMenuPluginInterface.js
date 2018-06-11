@@ -14,7 +14,26 @@ export class ContextMenuPluginInterface extends PluginInterface {
    * Define callback function when context menu is clicked
    * @returns function
    */
-  cb() {
+  onClick() {
     throw new Error('not implemented.');
+  }
+
+  items() {
+    throw new Error('not items.');
+  }
+
+  toObject() {
+    const _this = this;
+    return {
+      label: function() {
+        return _this.label();
+      },
+      onClick: function() {
+        return _this.onClick();
+      },
+      items: function() {
+        return _this.items();
+      }
+    };
   }
 }

@@ -53,70 +53,14 @@ export class Roadmappy extends EventEmitter {
       }
       plugin.initialize(this);
       if (plugin instanceof ContextMenuPluginInterface) {
-        contextMenus.push(plugin);
+        contextMenus.push(plugin.toObject());
       }
     });
 
-    // // init context menu
-    // if (contextMenus.length > 0) {
-    //   const contextMenu = new ContextMenu(contextMenus);
-    //   this.canvas.on('contextmenu:canvas', (mousePos) => {
-    //     d3.event.preventDefault();
-    //     contextMenu.show(this.canvas.svg, mousePos[0], mousePos[1]);
-    //   });
-    // }
-    const _this = this;
-    this.canvas.on('contextmenu:canvas', contextmenu([
-        {
-            label: "change to red",
-            onClick: function (e) {
-                _this.canvas.svg.node().style.background = "#ff0000";
-            }
-        },
-        {
-            label: "change color",
-            items: [
-                {
-                    label: "blue",
-                    onClick: function (e) {
-                        _this.canvas.svg.node().style.background = "#0000ff";
-                    }
-                },
-                {
-                    label: "pink",
-                    onClick: function(e) {
-                        alert('pink is clicked!');
-                    },
-                    items: function() {
-                        return [
-                            {
-                                label: "deep pink",
-                                onClick: function (e) {
-                                    _this.canvas.svg.node().style.background = "#ff1493";
-                                }
-                            },
-                            {
-                                label: "shocking pink",
-                                onClick: function (e) {
-                                    _this.canvas.svg.node().style.background = "#fc0fc0";
-                                }
-                            }
-                        ];
-                    }
-                }
-
-            ]
-        },
-        {
-            label: function () {
-                var date = new Date();
-                return 'Snow' + ':' + date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
-            },
-            onClick: function (e) {
-                _this.canvas.svg.node().style.background = "#fffafa";
-            }
-        }
-    ]));
+    // init context menu
+    if (contextMenus.length > 0) {
+      this.canvas.on('contextmenu:canvas', contextmenu(contextMenus));
+    }
 
   }
 

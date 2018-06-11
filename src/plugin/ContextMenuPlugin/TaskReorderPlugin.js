@@ -13,9 +13,13 @@ export class TaskReorderPlugin extends ContextMenuPluginInterface {
     return i18next.t('reorder task');
   }
 
-  cb() {
+  onClick() {
     this.roadmappy.roadmap.reorder();
     this.roadmappy.render();
+  }
+
+  items() {
+    return null;
   }
 
   getTranslation() {
