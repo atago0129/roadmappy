@@ -4,8 +4,8 @@ import { RoadmapCanvas } from './component/RoadmapCanvas';
 import { RoadmapOption } from './component/RoadmapOption';
 import { PluginInterface } from './plugin/PluginInterface';
 import i18next from 'i18next';
-import { ContextMenuPluginInterface } from './plugin/ContextMenuPlugin/ContextMenuPluginInterface';
-import { contextmenu } from '@atago0129/d3-v4-contextmenu';
+import { ContextMenuPluginInterface } from "./plugin/ContextMenuPlugin/ContextMenuPluginInterface";
+import { contextmenu } from "@atago0129/d3-v4-contextmenu";
 
 export class Roadmappy extends EventEmitter {
   roadmap;
@@ -55,6 +55,7 @@ export class Roadmappy extends EventEmitter {
         contextMenus.push(plugin);
       }
     });
+
 
     // init context menu
     if (contextMenus.length > 0) {
