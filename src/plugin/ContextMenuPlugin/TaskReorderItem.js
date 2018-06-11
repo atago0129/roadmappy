@@ -1,6 +1,6 @@
-import {ContextMenuItemInterface} from "./ContextMenuItemInterface";
+import {ContextMenuPluginInterface} from "./ContextMenuPluginInterface";
 
-export class TaskReorderItem extends ContextMenuItemInterface {
+export class TaskReorderItem extends ContextMenuPluginInterface {
 
   labelString;
 
@@ -12,7 +12,8 @@ export class TaskReorderItem extends ContextMenuItemInterface {
    * @param {string[]} sortKey
    */
   constructor(roadmappy, labelString, sortKey) {
-    this.roadmappy = roadmappy;
+    super();
+    this.initialize(roadmappy);
     this.labelString = labelString;
     this.sortKey = sortKey;
   }
@@ -27,7 +28,7 @@ export class TaskReorderItem extends ContextMenuItemInterface {
   };
 
   items = () => {
-
+    return null;
   }
 
 }

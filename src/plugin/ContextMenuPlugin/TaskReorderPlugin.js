@@ -1,8 +1,8 @@
 import i18next from "i18next";
-import { TaskReorderItem } from "./TaskReorderPluginItem";
-import { ContextMenuItemInterface } from "./ContextMenuItemInterface";
+import { TaskReorderItem } from "./TaskReorderItem";
+import { ContextMenuPluginInterface } from "./ContextMenuPluginInterface";
 
-export class TaskReorderPlugin extends ContextMenuItemInterface {
+export class TaskReorderPlugin extends ContextMenuPluginInterface {
 
   label = () => {
     return i18next.t('reorder task');
