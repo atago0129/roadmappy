@@ -5,7 +5,7 @@ import { ContextMenuPluginInterface } from "./ContextMenuPluginInterface";
 export class TaskReorderPlugin extends ContextMenuPluginInterface {
 
   label = () => {
-    return i18next.t('reorder task');
+    return i18next.t('Reorder task');
   };
 
   onClick = () => {
@@ -25,7 +25,7 @@ export class TaskReorderPlugin extends ContextMenuPluginInterface {
   getTranslation() {
     return {
       ja: {
-        'reorder task': 'タスクソート'
+        'Reorder task': 'タスクソート'
       }
     };
   }

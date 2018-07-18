@@ -3,7 +3,7 @@ import { RoadmapStyle } from './RoadmapStyle';
 import {
   CreateNewTaskPlugin,
   DraggableTaskPlugin,
-  ExportJsonDataToClipboardPlugin,
+  ExportTaskDataPlugin,
   TaskEditFormPlugin,
   TaskReorderPlugin
 } from '../';
@@ -34,7 +34,7 @@ export class RoadmapOption {
         // default plugins
         new DraggableTaskPlugin(),
         new TaskEditFormPlugin(),
-        new ExportJsonDataToClipboardPlugin(),
+        new ExportTaskDataPlugin(),
         new CreateNewTaskPlugin(),
         new TaskReorderPlugin()
       ]
