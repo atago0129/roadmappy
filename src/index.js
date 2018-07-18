@@ -1,5 +1,5 @@
 import { Roadmappy } from './Roadmappy';
-import { ExportJsonDataToClipboardPlugin } from './plugin/ContextMenuPlugin/ExportJsonDataToClipboardPlugin';
+import { ExportTaskDataPlugin } from './plugin/ContextMenuPlugin/ExportTaskDataPlugin';
 import { TaskEditFormPlugin } from './plugin/TaskEditFormPlugin/TaskEditFormPlugin';
 import { CreateNewTaskPlugin } from './plugin/CreateNewTaskPlugin';
 import { DraggableTaskPlugin } from './plugin/DraggableTaskPlugin';
@@ -15,7 +15,7 @@ if (document) {
 
 export default Roadmappy;
 
-export { ExportJsonDataToClipboardPlugin };
+export { ExportTaskDataPlugin };
 export { TaskEditFormPlugin };
 export { CreateNewTaskPlugin };
 export { DraggableTaskPlugin };
