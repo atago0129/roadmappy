@@ -20,7 +20,7 @@ export class ContextMenuPluginInterface extends PluginInterface {
    * Define callback function when context menu is clicked
    * @returns function
    */
-  onClick = () => {
+  action = () => {
     throw new Error('not implemented.');
   };
 
@@ -30,4 +30,3 @@ export class ContextMenuPluginInterface extends PluginInterface {
    */
   items = null;
 }
-
