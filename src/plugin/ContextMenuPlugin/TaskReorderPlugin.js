@@ -1,14 +1,13 @@
-import i18next from "i18next";
-import { TaskReorderItem } from "./TaskReorderItem";
-import { ContextMenuPluginInterface } from "./ContextMenuPluginInterface";
+import i18next from 'i18next';
+import { TaskReorderItem } from './TaskReorderItem';
+import { ContextMenuPluginInterface } from './ContextMenuPluginInterface';
 
 export class TaskReorderPlugin extends ContextMenuPluginInterface {
-
   label = () => {
     return i18next.t('Reorder task');
   };
 
-  onClick = () => {
+  action = () => {
     this.roadmappy.roadmap.reorder();
     this.roadmappy.render();
   };

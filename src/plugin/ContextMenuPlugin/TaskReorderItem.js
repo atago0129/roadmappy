@@ -1,7 +1,6 @@
-import {ContextMenuPluginInterface} from "./ContextMenuPluginInterface";
+import { ContextMenuPluginInterface } from './ContextMenuPluginInterface';
 
 export class TaskReorderItem extends ContextMenuPluginInterface {
-
   labelString;
 
   sortKey;
@@ -22,13 +21,12 @@ export class TaskReorderItem extends ContextMenuPluginInterface {
     return this.labelString;
   };
 
-  onClick = () => {
+  action = () => {
     this.roadmappy.roadmap.reorder(this.sortKey);
     this.roadmappy.render();
   };
 
   items = () => {
     return null;
-  }
-
+  };
 }

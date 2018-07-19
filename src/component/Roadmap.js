@@ -261,7 +261,7 @@ export class Roadmap {
    * @param {string[]|null} sortRule
    */
   reorder(sortRule = null) {
-    sortRule = (sortRule === null) ? this._taskSortRule : sortRule;
+    sortRule = sortRule === null ? this._taskSortRule : sortRule;
     this._assignees.sort((a, b) => {
       if (a.order !== b.order) {
         return a.order > b.order ? 1 : -1;
