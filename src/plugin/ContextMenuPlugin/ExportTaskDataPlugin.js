@@ -55,7 +55,7 @@ export class ExportTaskDataPlugin extends ContextMenuPluginInterface {
   getTranslation() {
     return {
       ja: {
-        'Export tasks': 'エクスポート',
+        Export: 'エクスポート',
         Clipboard: 'クリップボード',
         File: 'ファイル'
       }
