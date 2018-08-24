@@ -39,7 +39,7 @@
     "webpack-dev-server": "^2.11.2"
   },
   "dependencies": {
-    "@atago0129/d3-v4-contextmenu": "^1.1.0",
+    "@atago0129/d3-v4-contextmenu": "^1.2.0",
     "d3": "^4.13.0",
     "get-form-data": "^1.2.5",
     "i18next": "^10.6.0",
