@@ -369,7 +369,7 @@ export class RoadmapCanvas extends EventEmitter {
             2
       )
       .attr('y', mouseY - (this.style.barHeight + 8) / 2 + 40)
-      .style(
+      .attr(
         'width',
         this.mouseDate
           .select('.mouse-date-text')
